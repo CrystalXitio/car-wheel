@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPEC YOUR CAR — Car Build Randomizer</title>
+<meta name="description" content="Spin 22 engineered wheels to build your dream (or nightmare) machine. A hardcore car enthusiast randomizer with real engineering dependencies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --bg2: #121216;
+  --panel: rgba(255,255,255,0.03);
+  --red: #ff2200;
+  --orange: #ff7700;
+  --gold: #ffd700;
+  --txt: #f0f0f0;
+  --txt2: #888;
+  --txt3: #444;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
+  --F:#555; --D:#cc4444; --C:#44aa44; --B:#4488ff;
+  --A:#ffcc00; --S:#ff7700; --SS:#ff2277; --SSS:#bb44ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;background-color:var(--bg);color:var(--txt);
+  font-family:'Rajdhani',sans-serif;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 12% 55%, rgba(255,34,0,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 88% 20%, rgba(255,119,0,0.045) 0%, transparent 45%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,0.012) 0,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 6px),
+    repeating-linear-gradient(45deg,rgba(255,255,255,0.012) 0,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 6px);
+}
+
+/* ── INTRO SCREEN ── */
+#introScreen{
+  position:fixed;inset:0;z-index:500;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:24px;text-align:center;padding:40px;
+}
+.intro-logo{font-family:'Rajdhani',sans-serif;font-size:58px;font-weight:700;letter-spacing:6px;color:var(--txt);}
+.intro-logo span{color:var(--red);}
+.intro-tagline{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--txt2);letter-spacing:3px;}
+.intro-desc{max-width:600px;font-size:16px;color:var(--txt2);line-height:1.7;border:1px solid var(--border2);border-radius:10px;padding:24px;background:var(--panel);}
+.intro-desc strong{color:var(--orange);}
+.intro-tiers{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.tier-pill{padding:4px 12px;border-radius:20px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;}
+.start-btn{
+  padding:18px 70px;background:linear-gradient(135deg,var(--red),#aa0000);
+  border:none;border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:18px;
+  font-weight:700;letter-spacing:4px;color:#fff;cursor:pointer;
+  box-shadow:0 0 30px rgba(255,34,0,0.4),0 8px 30px rgba(0,0,0,0.6);
+  transition:all .3s;margin-top:8px;
+}
+.start-btn:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(255,34,0,0.6),0 12px 40px rgba(0,0,0,0.7);}
+.intro-warn{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--txt3);letter-spacing:2px;}
+
+/* ── HEADER ── */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 32px;border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:100;
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-mark{
+  width:34px;height:34px;background:linear-gradient(135deg,var(--red),var(--orange));
+  border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.logo-text{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;}
+.logo-text span{color:var(--red);}
+.header-mid{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--txt2);letter-spacing:1px;text-align:center;}
+.header-mid .wnum{color:var(--orange);font-size:24px;font-weight:700;}
+.header-right{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--txt2);text-align:right;}
+#headerHP{color:var(--orange);font-weight:700;}
+
+/* ── CATEGORY BANNER ── */
+.cat-banner{
+  padding:16px 32px;
+  background:linear-gradient(90deg,rgba(255,34,0,0.07),transparent 60%,rgba(255,119,0,0.04));
+  border-bottom:1px solid rgba(255,34,0,0.12);
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.cat-info{flex:1;}
+.cat-name{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.cat-sub{font-size:13px;color:var(--txt2);letter-spacing:1px;margin-top:3px;font-style:italic;}
+.dep-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.dep-tag{
+  background:rgba(255,119,0,0.08);border:1px solid rgba(255,119,0,0.25);
+  border-radius:4px;padding:3px 10px;font-size:11px;color:var(--orange);
+  letter-spacing:1px;font-family:'Share Tech Mono',monospace;
+}
+
+/* ── MAIN LAYOUT ── */
+.main-layout{
+  display:grid;grid-template-columns:310px 1fr 310px;
+}
+
+/* ── SIDE PANELS ── */
+.side-panel{
+  border-right:1px solid var(--border);padding:20px;
+  overflow-y:auto;max-height:calc(100vh - 200px);
+}
+.side-panel:last-child{border-right:none;border-left:1px solid var(--border);}
+.panel-hdr{
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:3px;color:var(--txt2);text-transform:uppercase;
+  margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+/* Garage items */
+.part-item{
+  padding:9px 11px;border-radius:6px;margin-bottom:7px;
+  background:var(--panel);border:1px solid var(--border);transition:.3s;
+}
+.part-item.pending{opacity:.3;border-style:dashed;}
+.part-item.active-slot{border-color:rgba(255,119,0,0.4);background:rgba(255,119,0,0.05);}
+.part-lbl{font-size:10px;color:var(--txt2);letter-spacing:1px;font-family:'Rajdhani',sans-serif;font-weight:600;}
+.part-val{font-size:15px;font-weight:700;margin:2px 0;}
+.part-tier-badge{
+  display:inline-block;font-size:9px;font-family:'Rajdhani',sans-serif;font-weight:700;
+  letter-spacing:1px;padding:1px 6px;border-radius:3px;margin-top:2px;
+}
+/* Option items */
+.opt-item{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;
+  border-radius:6px;margin-bottom:5px;background:var(--panel);
+  border:1px solid var(--border);position:relative;overflow:hidden;transition:.2s;
+}
+.opt-item:hover{border-color:var(--border2);}
+.opt-bar{position:absolute;left:0;top:0;bottom:0;opacity:.1;border-radius:6px;}
+.opt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.opt-name{font-size:12px;font-weight:600;line-height:1.2;}
+.opt-prob{font-size:10px;color:var(--txt2);font-family:'Share Tech Mono',monospace;}
+
+/* ── WHEEL CENTER ── */
+.wheel-section{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:32px 16px;gap:20px;
+  height:100%;overflow-y:auto;
+}
+.wheel-wrap{position:relative;width:460px;height:460px;}
+.pointer-svg{
+  position:absolute;top:2px;left:50%;transform:translateX(-50%);z-index:10;
+  filter:drop-shadow(0 0 12px var(--red)) drop-shadow(0 0 24px rgba(255,34,0,.5));
+}
+#wheelCanvas{border-radius:50%;box-shadow:0 0 50px rgba(255,34,0,0.08),0 0 100px rgba(255,34,0,0.04);}
+
+.spin-btn{
+  padding:14px 56px;background:linear-gradient(135deg,var(--red),#990000);
+  border:none;border-radius:6px;font-family:'Rajdhani',sans-serif;
+  font-size:16px;font-weight:700;letter-spacing:3px;color:#fff;cursor:pointer;
+  box-shadow:0 0 20px rgba(255,34,0,0.3),0 4px 20px rgba(0,0,0,0.5);
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.spin-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 0 40px rgba(255,34,0,0.5),0 8px 30px rgba(0,0,0,0.7);
+}
+.spin-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.continue-btn{
+  padding:12px 40px;background:transparent;border:2px solid var(--orange);
+  border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:14px;
+  font-weight:700;letter-spacing:2px;color:var(--orange);cursor:pointer;
+  transition:all .3s;display:none;
+}
+.continue-btn:hover{background:var(--orange);color:#000 !important;}
+/* Aesthetics phase continue btn */
+.continue-btn.style-phase:hover{background:#aa44ff;color:#000 !important;}
+/* Auto-spin button */
+.auto-spin-btn{
+  padding:10px 28px;background:transparent;
+  border:2px solid rgba(255,255,255,0.18);
+  border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:13px;
+  font-weight:700;letter-spacing:2px;color:var(--txt2);cursor:pointer;
+  transition:all .3s;position:relative;
+}
+.auto-spin-btn:hover:not(:disabled){border-color:var(--orange);color:var(--orange);box-shadow:0 0 14px rgba(255,119,0,0.2);}
+.auto-spin-btn.style-phase{border-color:rgba(170,68,255,0.3);color:#aa44ff;}
+.auto-spin-btn.style-phase:hover{border-color:#aa44ff;box-shadow:0 0 14px rgba(170,68,255,0.2);}
+/* Toggle ON state */
+.auto-spin-btn.on{
+  border-color:var(--orange);color:var(--orange);
+  background:rgba(255,119,0,0.08);
+  animation:pulse-auto 1.6s ease-in-out infinite;
+}
+.auto-spin-btn.on.style-phase{
+  border-color:#aa44ff;color:#aa44ff;
+  background:rgba(170,68,255,0.08);
+  animation:pulse-auto-style 1.6s ease-in-out infinite;
+}
+@keyframes pulse-auto{
+  0%,100%{box-shadow:0 0 10px rgba(255,119,0,0.3);}
+  50%{box-shadow:0 0 24px rgba(255,119,0,0.65);}
+}
+@keyframes pulse-auto-style{
+  0%,100%{box-shadow:0 0 10px rgba(170,68,255,0.3);}
+  50%{box-shadow:0 0 24px rgba(170,68,255,0.65);}
+}
+/* Auto countdown overlay */
+#autoCountdown{
+  display:none;position:absolute;inset:0;z-index:50;
+  align-items:center;justify-content:center;pointer-events:none;
+}
+.acd-bubble{
+  background:rgba(8,8,14,0.92);border:2px solid var(--orange);
+  border-radius:14px;padding:18px 38px;text-align:center;
+  box-shadow:0 0 30px rgba(255,119,0,0.4);
+  animation:pop-in .2s ease;
+}
+.acd-bubble.style-phase{border-color:#aa44ff;box-shadow:0 0 30px rgba(170,68,255,0.4);}
+.acd-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:3px;margin-bottom:4px;}
+.acd-num{font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:900;color:var(--orange);line-height:1;text-shadow:0 0 20px currentColor;}
+.acd-bubble.style-phase .acd-num{color:#aa44ff;}
+.btn-row{display:flex;gap:14px;align-items:center;}
+
+.result-box{
+  width:100%;max-width:440px;background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:16px;text-align:center;min-height:90px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.res-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:3px;margin-bottom:6px;}
+.res-val{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;letter-spacing:1px;}
+.res-desc{font-size:13px;color:var(--txt2);margin-top:5px;font-style:italic;}
+.res-tier{
+  margin-top:8px;padding:2px 10px;border-radius:3px;font-family:'Rajdhani',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:1px;
+}
+
+/* ── PROGRESS FOOTER ── */
+.prog-footer{
+  padding:16px 28px;border-top:1px solid var(--border);
+  background:rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:10px;
+}
+.prog-footer-label{
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:3px;color:var(--txt2);text-transform:uppercase;
+}
+.prog-dots{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.prog-dot{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.dot-circle{
+  width:42px;height:42px;border-radius:50%;border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;
+  color:var(--txt3);transition:all .4s;
+}
+.dot-circle.active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 16px rgba(255,119,0,.5);}
+.dot-circle.done{border-color:var(--red);background:rgba(255,34,0,.12);color:var(--red);}
+.dot-circle.clickable{cursor:pointer;}
+.dot-circle.clickable:hover{transform:scale(1.12);border-color:var(--gold);color:var(--gold);box-shadow:0 0 14px rgba(255,215,0,.4);}
+.dot-lbl{font-size:9px;color:var(--txt3);font-family:'Rajdhani',sans-serif;letter-spacing:.5px;text-align:center;max-width:46px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dot-circle.active+.dot-lbl{color:var(--orange);font-weight:700;}
+.dot-circle.done+.dot-lbl{color:rgba(255,34,0,.8);}
+
+/* ── MINI STATS ── */
+.mini-stats{
+  padding:10px;background:rgba(255,34,0,0.04);border:1px solid rgba(255,34,0,.08);
+  border-radius:6px;margin-top:12px;
+}
+.ms-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;}
+.ms-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);}
+.ms-val{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--orange);}
+
+/* ── FINAL SCREEN ── */
+#finalScreen{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.97);overflow-y:auto;
+  flex-direction:column;align-items:center;padding:40px 20px;
+  backdrop-filter:blur(20px);
+}
+#finalScreen.visible{display:flex;}
+.final-title{
+  font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;
+  letter-spacing:4px;color:var(--gold);
+  text-shadow:0 0 30px rgba(255,215,0,.5);margin-bottom:4px;text-align:center;
+}
+.final-sub{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--txt2);letter-spacing:4px;text-align:center;margin-bottom:28px;}
+.nickname{text-align:center;margin-bottom:24px;}
+.nick-lbl{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--txt2);letter-spacing:3px;margin-bottom:6px;}
+.nick-val{font-family:'Rajdhani',sans-serif;font-size:34px;font-weight:700;letter-spacing:1px;}
+.rating-row{
+  display:flex;gap:0;align-items:stretch;margin-bottom:28px;
+  border:1px solid rgba(255,215,0,.15);border-radius:10px;overflow:hidden;
+}
+.rating-cell{padding:18px 30px;text-align:center;flex:1;}
+.rating-cell:not(:last-child){border-right:1px solid rgba(255,255,255,.07);}
+.rat-lbl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:3px;margin-bottom:6px;}
+.rat-val{font-family:'Rajdhani',sans-serif;font-size:38px;font-weight:700;color:var(--gold);}
+.spec-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  max-width:860px;width:100%;margin-bottom:28px;
+}
+.spec-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+}
+.sc-lbl{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--txt2);margin-bottom:5px;}
+.sc-val{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;}
+.sc-sub{font-size:11px;color:var(--txt2);margin-top:2px;}
+.restart-btn{
+  padding:14px 48px;background:transparent;border:2px solid var(--orange);
+  border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:15px;
+  font-weight:700;letter-spacing:3px;color:var(--orange);cursor:pointer;transition:.3s;
+}
+.restart-btn:hover{background:var(--orange);color:#000;box-shadow:0 0 20px rgba(255,119,0,.4);}
+
+/* ── ANIMATIONS ── */
+@keyframes pop-in{from{transform:scale(.8);opacity:0}50%{transform:scale(1.04)}to{transform:scale(1);opacity:1}}
+.pop-in{animation:pop-in .45s ease}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 10px rgba(255,119,0,.3)}50%{box-shadow:0 0 22px rgba(255,119,0,.6)}}
+.dot-circle.active{animation:pulse-ring 1.6s infinite;}
+/* ── PHASE TRANSITION ── */
+#phaseTransition{
+  display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.97);
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;text-align:center;padding:40px;
+}
+.pt-line{width:320px;height:1px;background:linear-gradient(90deg,transparent,#aa44ff,transparent);}
+.pt-begin-btn{
+  padding:14px 52px;background:linear-gradient(135deg,#aa44ff,#660099);
+  border:none;border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:16px;
+  font-weight:700;letter-spacing:3px;color:#fff;cursor:pointer;margin-top:8px;
+  box-shadow:0 0 24px rgba(170,68,255,.5);transition:all .3s;
+}
+.pt-begin-btn:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(170,68,255,.7);}
+/* ── SPEC SECTION HEADER (final screen grid) ── */
+.spec-section-hdr{
+  grid-column:1/-1;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:3px;padding:10px 0;border-bottom:1px solid;
+  margin-bottom:4px;
+}
+/* ── AESTHETIC PHASE ACCENT ── */
+.style-dep-tag{
+  background:rgba(170,68,255,.08);border:1px solid rgba(170,68,255,.25);
+  border-radius:4px;padding:3px 10px;font-size:11px;color:#aa44ff;
+  letter-spacing:1px;font-family:'Share Tech Mono',monospace;
+}
+/* ── CAR LAB ── */
+#carLab{
+  display:none;position:fixed;inset:0;z-index:350;
+  background:rgba(4,4,8,.98);overflow-y:auto;
+  flex-direction:column;align-items:stretch;padding:0;
+  backdrop-filter:blur(20px);
+}
+#carLab.visible{display:flex;}
+.lab-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 32px;border-bottom:1px solid rgba(170,68,255,.2);
+  background:rgba(0,0,0,.5);position:sticky;top:0;z-index:10;
+}
+.lab-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;
+  letter-spacing:2px;background:linear-gradient(135deg,var(--orange),#aa44ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.lab-close-btn{
+  padding:8px 24px;background:transparent;border:1px solid var(--border2);
+  border-radius:5px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:2px;color:var(--txt2);cursor:pointer;transition:.3s;
+}
+.lab-close-btn:hover{border-color:var(--orange);color:var(--orange);}
+.lab-body{
+  display:grid;grid-template-columns:1fr 1fr 320px;gap:0;
+}
+.lab-col{
+  padding:20px 18px;border-right:1px solid var(--border);
+}
+.lab-col:last-child{border-right:none;border-left:1px solid var(--border);}
+.lab-col-hdr{
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding-bottom:10px;margin-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.lab-field{margin-bottom:12px;}
+.lab-lbl{
+  font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:1.5px;color:var(--txt2);text-transform:uppercase;margin-bottom:4px;
+}
+.lab-select{
+  width:100%;padding:8px 10px;background:var(--panel);border:1px solid var(--border2);
+  border-radius:5px;color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:13px;
+  font-weight:500;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  transition:border-color .2s;
+}
+.lab-select:hover,.lab-select:focus{border-color:var(--orange);outline:none;}
+/* Stats centre column */
+.stat-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;margin-bottom:8px;
+}
+.stat-key{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:1.5px;color:var(--txt2);text-transform:uppercase;margin-bottom:3px;}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  color:var(--orange);line-height:1;}
+.stat-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:6px;}
+.stat-bar{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--orange),var(--red));transition:width .4s;}
+.stat-sub{font-size:10px;color:var(--txt2);margin-top:3px;}
+.find-btn{
+  width:100%;padding:14px;margin-top:12px;
+  background:linear-gradient(135deg,var(--orange),#aa00ff);
+  border:none;border-radius:7px;font-family:'Rajdhani',sans-serif;
+  font-size:16px;font-weight:700;letter-spacing:3px;color:#fff;
+  cursor:pointer;box-shadow:0 0 24px rgba(255,119,0,.3);transition:.3s;
+}
+.find-btn:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(255,119,0,.5);}
+/* Match results */
+.lab-results{
+  padding:20px 32px;border-top:1px solid var(--border);
+  background:rgba(0,0,0,.3);
+}
+.matches-title{
+  font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:2px;color:var(--gold);margin-bottom:16px;text-transform:uppercase;
+}
+.match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;}
+.match-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:8px;padding:14px 16px;transition:.2s;
+}
+.match-card:hover{border-color:var(--border2);}
+.match-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.match-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;}
+.match-pct{
+  font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
+  color:var(--orange);
+}
+.match-bar-wrap{height:3px;background:var(--border);border-radius:2px;margin-bottom:6px;}
+.match-bar{height:3px;border-radius:2px;transition:width .5s;}
+.match-desc{font-size:11px;color:var(--txt2);line-height:1.5;}
+.match-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.match-tag{
+  font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;
+  padding:2px 7px;border-radius:3px;letter-spacing:.5px;
+  background:rgba(255,255,255,.05);color:var(--txt2);
+}
+.open-lab-btn{
+  padding:14px 48px;background:linear-gradient(135deg,rgba(170,68,255,.2),rgba(255,119,0,.2));
+  border:2px solid rgba(170,68,255,.4);
+  border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:15px;
+  font-weight:700;letter-spacing:3px;color:#cc88ff;cursor:pointer;transition:.3s;margin-top:12px;
+}
+.open-lab-btn:hover{background:linear-gradient(135deg,#aa44ff,var(--orange));color:#fff;
+  border-color:transparent;box-shadow:0 0 30px rgba(170,68,255,.4);}
+
+/* ── CUSTOM SCROLLBARS ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.02);border-radius:3px;}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--orange),var(--red));
+  border-radius:3px;
+}
+::-webkit-scrollbar-thumb:hover{
+  background:var(--orange);
+  box-shadow:0 0 6px rgba(255,119,0,.6);
+}
+::-webkit-scrollbar-corner{background:var(--bg);}
+#carLab ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#aa44ff,#660099);}
+#carLab ::-webkit-scrollbar-thumb:hover{background:#aa44ff;box-shadow:0 0 6px rgba(170,68,255,.6);}
+#finalScreen ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold),var(--orange));}
+*{scrollbar-width:thin;scrollbar-color:var(--orange) transparent;}
+#carLab *{scrollbar-color:#aa44ff transparent;}
+
+/* ── SCROLL CONTAINMENT ── */
+.side-panel,#finalScreen,#carLab,.csel-list{
+  overscroll-behavior:contain;
+}
+
+/* ── CUSTOM SELECT (CSEL) ── */
+.csel{position:relative;width:100%;user-select:none;}
+.csel-trigger{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;background:rgba(255,255,255,.03);
+  border:1px solid var(--border2);border-radius:5px;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;
+}
+.csel-trigger:hover{border-color:var(--orange);box-shadow:0 0 8px rgba(255,119,0,.12);}
+.csel.open .csel-trigger{border-color:var(--orange);border-bottom-color:transparent;border-radius:5px 5px 0 0;box-shadow:none;}
+.csel-tier{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;flex-shrink:0;min-width:32px;}
+.csel-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.csel-arrow{color:var(--txt2);transition:transform .25s,color .2s;flex-shrink:0;font-size:10px;}
+.csel.open .csel-arrow{transform:rotate(180deg);color:var(--orange);}
+.csel-list{
+  display:none;position:absolute;top:100%;left:0;right:0;z-index:1000;
+  background:rgba(8,8,14,.97);border:1px solid var(--orange);
+  border-top:none;border-radius:0 0 6px 6px;
+  max-height:240px;overflow-y:auto;
+  box-shadow:0 12px 32px rgba(0,0,0,.9);
+  animation:fade-in .15s ease;
+}
+.csel.open .csel-list{display:block;}
+@keyframes fade-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.csel-opt{
+  display:flex;align-items:center;gap:8px;padding:7px 12px;
+  cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .12s;
+}
+.csel-opt:last-child{border-bottom:none;}
+.csel-opt:hover{background:rgba(255,255,255,.06);}
+.csel-opt.csel-active{background:rgba(255,119,0,.07);}
+.csel-otier{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;flex-shrink:0;min-width:32px;}
+.csel-olabel{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:500;flex:1;}
+.csel-opct{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);flex-shrink:0;}
+
+/* ── REVIEW MODAL ── */
+#reviewModal{
+  display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);
+  align-items:center;justify-content:center;
+}
+#reviewModal.open{display:flex;}
+.review-box{
+  background:#111118;border:1px solid var(--border2);border-radius:12px;
+  padding:32px;max-width:480px;width:90%;position:relative;text-align:center;
+}
+.review-close{
+  position:absolute;top:14px;right:18px;background:none;border:none;
+  color:var(--txt2);font-size:20px;cursor:pointer;font-family:'Rajdhani',sans-serif;
+  transition:color .2s;
+}
+.review-close:hover{color:var(--txt);}
+.review-cat{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:3px;margin-bottom:6px;}
+.review-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:1px;margin-bottom:4px;}
+.review-desc{font-size:13px;color:var(--txt2);font-style:italic;margin-bottom:10px;}
+.review-tier{display:inline-block;padding:3px 12px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;}
+.review-locked{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--txt3);margin-top:12px;letter-spacing:2px;}
+
+/* ═══════════════════════════════════════════════════════════
+   VISUAL ENHANCEMENT LAYER — Glow · Motion · Depth · Texture
+═══════════════════════════════════════════════════════════ */
+
+/* ── INTRO: Animated ambient light behind content ── */
+#introScreen{position:relative;overflow:hidden;}
+#introScreen::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 18% 60%, rgba(255,34,0,0.11) 0%, transparent 52%),
+    radial-gradient(ellipse at 82% 28%, rgba(255,119,0,0.08) 0%, transparent 46%),
+    radial-gradient(ellipse at 50% 90%, rgba(170,68,255,0.06) 0%, transparent 45%);
+  animation:intro-ambient 5s ease-in-out infinite alternate;
+}
+#introScreen>*{position:relative;z-index:1;}
+@keyframes intro-ambient{from{opacity:.55;}to{opacity:1;}}
+
+/* Intro logo — neon glow depth */
+.intro-logo{
+  text-shadow:0 0 48px rgba(255,255,255,0.08),0 0 80px rgba(255,34,0,0.12);
+  animation:logo-text-breathe 4s ease-in-out infinite alternate;
+}
+@keyframes logo-text-breathe{
+  from{text-shadow:0 0 30px rgba(255,255,255,0.05),0 0 60px rgba(255,34,0,0.08);}
+  to{text-shadow:0 0 60px rgba(255,255,255,0.12),0 0 120px rgba(255,34,0,0.18),0 0 200px rgba(255,119,0,0.08);}
+}
+
+/* Start button — more dramatic pulsing glow */
+@keyframes start-pulse{
+  0%,100%{box-shadow:0 0 28px rgba(255,34,0,0.4),0 8px 28px rgba(0,0,0,0.6);}
+  50%{box-shadow:0 0 60px rgba(255,34,0,0.72),0 12px 48px rgba(0,0,0,0.8),0 0 120px rgba(255,119,0,0.22);}
+}
+.start-btn{animation:start-pulse 2.6s ease-in-out infinite;}
+.start-btn:hover{animation:none;box-shadow:0 0 70px rgba(255,34,0,0.8),0 16px 56px rgba(0,0,0,0.9);}
+
+/* ── HEADER: bottom accent glow strip ── */
+.app-header{position:relative;}
+.app-header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,34,0,0.35) 20%,rgba(255,119,0,0.45) 50%,rgba(255,34,0,0.35) 80%,transparent 100%);
+}
+/* Header HP value glow */
+#headerHP{text-shadow:0 0 14px rgba(255,119,0,0.7);}
+
+/* Logo mark — subtle heartbeat glow */
+@keyframes logo-mark-pulse{
+  0%,100%{box-shadow:0 0 8px rgba(255,34,0,0.4);}
+  50%{box-shadow:0 0 22px rgba(255,34,0,0.75),0 0 44px rgba(255,119,0,0.28);}
+}
+.logo-mark{animation:logo-mark-pulse 2.8s ease-in-out infinite;}
+
+/* ── CATEGORY BANNER: left accent bar ── */
+.cat-banner{
+  border-left:3px solid var(--orange);
+  padding-left:29px;
+}
+.cat-name{text-shadow:0 0 20px rgba(255,119,0,0.22);}
+
+/* ── SPIN BUTTON: shimmer sweep ── */
+.spin-btn::after{
+  content:'';position:absolute;top:0;left:-90%;width:45%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent);
+  transform:skewX(-14deg);
+  animation:btn-shimmer 3.6s ease-in-out infinite;
+}
+@keyframes btn-shimmer{0%,60%,100%{left:-90%;opacity:0;}25%{opacity:1;}45%{left:135%;opacity:0;}}
+
+/* Continue button — shimmer (delayed) */
+.continue-btn{position:relative;overflow:hidden;}
+.continue-btn::after{
+  content:'';position:absolute;top:0;left:-90%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  transform:skewX(-14deg);
+  animation:btn-shimmer 4.2s ease-in-out infinite 1.2s;
+}
+
+/* ── WHEEL WRAP: outer ring pulse ── */
+.wheel-wrap::before{
+  content:'';position:absolute;inset:-18px;border-radius:50%;pointer-events:none;z-index:0;
+  border:1px solid rgba(255,34,0,0.1);
+  box-shadow:0 0 60px rgba(255,34,0,0.1),inset 0 0 40px rgba(255,34,0,0.05);
+  animation:wheel-halo 3.2s ease-in-out infinite;
+}
+@keyframes wheel-halo{
+  0%,100%{box-shadow:0 0 48px rgba(255,34,0,0.08),inset 0 0 30px rgba(255,34,0,0.04);opacity:.7;}
+  50%{box-shadow:0 0 110px rgba(255,34,0,0.18),inset 0 0 70px rgba(255,34,0,0.09);opacity:1;}
+}
+/* Wheel canvas — stronger resting glow */
+#wheelCanvas{
+  box-shadow:0 0 60px rgba(255,34,0,0.12),0 0 120px rgba(255,34,0,0.06),0 0 6px rgba(0,0,0,0.8);
+  position:relative;z-index:1;
+}
+
+/* ── ENHANCED POP-IN: add blur dissolve ── */
+@keyframes pop-in{
+  from{transform:scale(.78);opacity:0;filter:blur(6px);}
+  55%{transform:scale(1.05);filter:blur(0);}
+  to{transform:scale(1);opacity:1;filter:blur(0);}
+}
+
+/* ── RESULT BOX: glow when result shown ── */
+.result-box{
+  transition:box-shadow .5s,border-color .5s;
+  box-shadow:0 4px 24px rgba(0,0,0,0.35);
+}
+
+/* ── PANEL HEADER: gradient accent underline ── */
+.panel-hdr{position:relative;}
+.panel-hdr::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,var(--orange),rgba(255,119,0,0.3) 55%,transparent 80%);
+  opacity:.55;
+}
+
+/* ── PART ITEMS: hover slide + done glow ── */
+.part-item{transition:transform .22s,border-color .22s,box-shadow .22s;}
+.part-item:not(.pending):hover{
+  transform:translateX(4px);
+  border-color:rgba(255,119,0,0.28);
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);
+}
+/* Completed item — subtle left accent bar */
+.part-item:not(.pending):not(.active-slot){border-left:3px solid rgba(255,34,0,0.35);}
+
+/* ── OPT ITEMS: hover brightens bar ── */
+.opt-item{transition:border-color .18s,background .18s;}
+.opt-item:hover{border-color:var(--border2);background:rgba(255,255,255,0.04);}
+.opt-item:hover .opt-bar{opacity:.18;}
+
+/* ── PROGRESS FOOTER ── */
+.prog-footer{
+  background:linear-gradient(180deg,rgba(0,0,0,0.3),rgba(0,0,0,0.65));
+  border-top:1px solid rgba(255,119,0,0.12);
+  box-shadow:0 -4px 30px rgba(0,0,0,0.4);
+}
+/* Active dot — brighter glow */
+.dot-circle.active{
+  box-shadow:0 0 18px rgba(255,119,0,.65),0 0 5px rgba(255,119,0,.4) inset;
+  background:rgba(255,119,0,0.08);
+}
+/* Done dot — richer treatment */
+.dot-circle.done{
+  background:linear-gradient(135deg,rgba(255,34,0,0.18),rgba(255,119,0,0.08));
+  box-shadow:0 0 8px rgba(255,34,0,0.25);
+}
+
+/* ── PHASE TRANSITION: ambient radial bg ── */
+#phaseTransition{
+  background:
+    radial-gradient(ellipse at center bottom, rgba(170,68,255,0.14) 0%, transparent 60%),
+    radial-gradient(ellipse at center top, rgba(255,119,0,0.07) 0%, transparent 50%),
+    rgba(0,0,0,.97);
+}
+
+/* ── MINI STATS: aesthetics-aware accent ── */
+.mini-stats{
+  box-shadow:0 0 0 1px rgba(255,34,0,0.07),0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* ── FINAL SCREEN ── */
+#finalScreen{
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 80%, rgba(170,68,255,0.07) 0%, transparent 45%),
+    rgba(0,0,0,.97);
+}
+.final-title{animation:final-title-glow 3s ease-in-out infinite alternate;}
+@keyframes final-title-glow{
+  from{text-shadow:0 0 22px rgba(255,215,0,0.4);}
+  to{text-shadow:0 0 50px rgba(255,215,0,0.75),0 0 90px rgba(255,119,0,0.25);}
+}
+/* Rating row — glass panel */
+.rating-row{
+  background:linear-gradient(180deg,rgba(255,255,255,0.025) 0%, rgba(0,0,0,0) 100%);
+  box-shadow:0 4px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,215,0,0.08);
+}
+.rat-val{transition:text-shadow .3s;}
+.rat-val:hover{text-shadow:0 0 20px currentColor;}
+
+/* Spec cards — hover lift */
+.spec-card{transition:transform .22s,border-color .22s,box-shadow .22s;}
+.spec-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(255,119,0,0.18);
+  box-shadow:0 8px 28px rgba(0,0,0,0.45);
+}
+
+/* Match cards — hover lift */
+.match-card{transition:transform .2s,box-shadow .2s;}
+.match-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 32px rgba(0,0,0,0.5);
+}
+
+/* ── REVIEW MODAL: glow border ── */
+.review-box{
+  box-shadow:0 0 0 1px var(--border2),0 0 60px rgba(0,0,0,0.8),0 0 40px rgba(255,119,0,0.07);
+  animation:review-in .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes review-in{from{transform:scale(.88);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* ── ACD COUNTDOWN NUMBER: scale bounce ── */
+.acd-num{animation:acd-tick .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes acd-tick{from{transform:scale(.6);}to{transform:scale(1);}}
+
+/* ── LAB STAT CARDS: hover border glow ── */
+.stat-card{transition:border-color .2s,box-shadow .2s;}
+.stat-card:hover{border-color:rgba(255,119,0,0.22);box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+
+/* ── FIND-MATCH BTN: shimmer ── */
+.find-btn{position:relative;overflow:hidden;}
+.find-btn::after{
+  content:'';position:absolute;top:0;left:-90%;width:45%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);
+  transform:skewX(-14deg);
+  animation:btn-shimmer 4s ease-in-out infinite 0.8s;
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO SCREEN -->
+<div id="introScreen">
+  <div class="intro-logo">SPEC <span>YOUR CAR</span></div>
+  <div style="font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--txt3);letter-spacing:4px">— CAR BUILD RANDOMIZER —</div>
+  <div class="intro-tagline">// 22 WHEELS. 2 PHASES. ONE MACHINE. //</div>
+  <div class="intro-desc">
+    Spin each wheel to land on a car component. <strong>Every spin is a gamble</strong> — each wheel contains options across all tiers, from budget spec to full-race mythic. Components are random but <strong>engineering-aware</strong>: your chosen spec influences what is possible on the next wheel.<br><br>
+    Probabilities are engineered for excitement: <strong>every tier has a meaningful chance</strong> — SSS items land at ~5%, ensuring roughly 2 out of 3 full builds include at least one mythic pull. Common options remain more likely, but never overwhelming.
+    <div class="intro-tiers">
+      <span class="tier-pill" style="background:#55555522;color:#888;border:1px solid #555">F — MISERABLE</span>
+      <span class="tier-pill" style="background:#cc444422;color:#cc4444;border:1px solid #cc4444">D — POOR</span>
+      <span class="tier-pill" style="background:#44aa4422;color:#44aa44;border:1px solid #44aa44">C — ACCEPTABLE</span>
+      <span class="tier-pill" style="background:#4488ff22;color:#4488ff;border:1px solid #4488ff">B — DECENT</span>
+      <span class="tier-pill" style="background:#ffcc0022;color:#ffcc00;border:1px solid #ffcc00">A — GOOD</span>
+      <span class="tier-pill" style="background:#ff770022;color:#ff7700;border:1px solid #ff7700">S — GREAT</span>
+      <span class="tier-pill" style="background:#ff227722;color:#ff2277;border:1px solid #ff2277">SS — ELITE</span>
+      <span class="tier-pill" style="background:#bb44ff22;color:#bb44ff;border:1px solid #bb44ff">SSS — MYTHIC</span>
+    </div>
+  </div>
+  <button class="start-btn" id="startBtn">▶ BEGIN BUILD SEQUENCE</button>
+  <div class="intro-warn">// TURN ON AUDIO FOR FULL EXPERIENCE //</div>
+</div>
+
+<!-- MAIN APP (hidden until start) -->
+<div id="appBody" style="display:none">
+  <header class="app-header">
+    <div class="logo"><div class="logo-mark">🏎</div><div class="logo-text">SPEC<span>YOUR CAR</span></div></div>
+    <div class="header-mid">WHEEL <span class="wnum" id="wheelNum">1</span> / 22 &nbsp;<span id="phaseBadge" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--orange);letter-spacing:2px">⚡ PERFORMANCE</span></div>
+    <div class="header-right">POWER<br><span id="headerHP">0 BHP</span></div>
+  </header>
+
+  <div class="cat-banner">
+    <div class="cat-info">
+      <div class="cat-name" id="catName">ENGINE DISPLACEMENT</div>
+      <div class="cat-sub" id="catSub">The foundation. The soul. Choose your displacement.</div>
+    </div>
+    <div class="dep-tags" id="depTags"></div>
+  </div>
+
+  <div class="main-layout" id="mainLayout">
+    <!-- LEFT: GARAGE -->
+    <aside class="side-panel">
+      <div class="panel-hdr">YOUR BUILD</div>
+      <div id="partsList"></div>
+      <div class="mini-stats" id="miniStats" style="display:none">
+        <div class="ms-row"><span class="ms-lbl">POWER</span><span class="ms-val" id="msHP">0 BHP</span></div>
+        <div class="ms-row"><span class="ms-lbl" id="msTierLbl">POWER TIER</span><span class="ms-val" id="msTier">—</span></div>
+        <div class="ms-row"><span class="ms-lbl" id="msBottomLbl">TORQUE</span><span class="ms-val" id="msTQ">0 lb-ft</span></div>
+      </div>
+    </aside>
+
+    <!-- CENTER: WHEEL -->
+    <section class="wheel-section">
+      <div class="wheel-wrap" id="wheelWrap">
+        <div class="pointer-svg">
+          <svg width="28" height="36" viewBox="0 0 28 36"><polygon points="14,34 0,0 28,0" fill="#ff2200"/><polygon points="14,26 5,4 23,4" fill="rgba(255,80,0,0.4)"/></svg>
+        </div>
+        <canvas id="wheelCanvas" width="460" height="460"></canvas>
+      </div>
+      <div class="btn-row">
+        <button class="spin-btn" id="spinBtn" onclick="startSpin()">▶ SPIN THE WHEEL</button>
+        <button class="continue-btn" id="continueBtn" onclick="advance()">NEXT WHEEL →</button>
+      </div>
+      <div style="position:relative;width:100%;max-width:440px;display:flex;justify-content:center">
+        <button class="auto-spin-btn" id="autoSpinBtn" onclick="toggleAutoSpin()" title="Toggle auto-spin for this phase">⚡ AUTO SPIN</button>
+        <div id="autoCountdown">
+          <div class="acd-bubble" id="acdBubble">
+            <div class="acd-label">NEXT WHEEL IN</div>
+            <div class="acd-num" id="acdNum">3</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-box" id="resultBox">
+        <div class="res-lbl">AWAITING RESULT</div>
+        <div style="color:var(--txt3);font-family:'Share Tech Mono',monospace;font-size:12px">Press SPIN to randomize this component</div>
+      </div>
+    </section>
+
+    <!-- RIGHT: OPTIONS -->
+    <aside class="side-panel">
+      <div class="panel-hdr">AVAILABLE OPTIONS</div>
+      <div id="optsList"></div>
+    </aside>
+  </div>
+
+  <footer class="prog-footer">
+    <div class="prog-footer-label">// SPEC YOUR CAR //</div>
+    <div id="progDots" class="prog-dots"></div>
+  </footer>
+</div>
+
+<!-- PHASE TRANSITION -->
+<div id="phaseTransition">
+  <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--txt2);letter-spacing:4px">// PHASE 1 COMPLETE //</div>
+  <div style="font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:900;color:var(--orange);letter-spacing:3px">PERFORMANCE</div>
+  <div style="font-family:'Rajdhani',sans-serif;font-size:40px;font-weight:900;color:var(--gold);letter-spacing:3px">BUILD LOCKED</div>
+  <div id="ptDetails" style="font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--txt2);max-width:600px;line-height:1.6"></div>
+  <div class="pt-line"></div>
+  <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#aa44ff;letter-spacing:2px">INITIATING AESTHETICS PHASE</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--txt2)">10 WHEELS REMAINING — PAINT, RIMS, STANCE, INTERIOR &amp; MORE</div>
+  <button class="pt-begin-btn" onclick="beginAesthetics()">✨ BEGIN AESTHETICS PHASE</button>
+</div>
+
+<!-- FINAL SCREEN -->
+<div id="finalScreen">
+  <div class="final-title">BUILD COMPLETE</div>
+  <div class="final-sub">YOUR MACHINE HAS BEEN FORGED — IN METAL AND STYLE</div>
+  <div class="nickname">
+    <div class="nick-lbl">// PERFORMANCE CODENAME //</div>
+    <div class="nick-val" id="carNick">—</div>
+    <div style="margin-top:10px"><span class="nick-lbl">// STYLE VIBE //</span></div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#aa44ff;letter-spacing:1px;margin-top:4px" id="buildVibe">—</div>
+  </div>
+  <div class="rating-row">
+    <div class="rating-cell"><div class="rat-lbl">OVERALL RATING</div><div class="rat-val" id="ratingLetter">B</div></div>
+    <div class="rating-cell"><div class="rat-lbl">BUILD CLASS</div><div class="rat-val" style="font-size:20px;color:var(--orange)" id="buildClass">—</div></div>
+    <div class="rating-cell"><div class="rat-lbl">PERF SCORE</div><div class="rat-val" id="enthScore">—</div></div>
+    <div class="rating-cell"><div class="rat-lbl">STYLE SCORE</div><div class="rat-val" style="color:#aa44ff" id="styleScoreEl">—</div></div>
+    <div class="rating-cell"><div class="rat-lbl">EST. 0–60</div><div class="rat-val" style="font-size:20px" id="est060">—</div></div>
+  </div>
+  <div class="spec-grid" id="specGrid"></div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:4px">
+    <button class="open-lab-btn" onclick="openLab()">🔬 OPEN CONFIGURATION LAB</button>
+    <button class="restart-btn" onclick="restartGame()">↺ REBUILD FROM SCRATCH</button>
+  </div>
+</div>
+
+<!-- CAR CONFIGURATION LAB -->
+<div id="carLab">
+  <header class="lab-header">
+    <div>
+      <div class="lab-title">⚙ CAR CONFIGURATION LAB</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:2px;margin-top:3px">FREE BUILD MODE — EDIT ANY OPTION — LIVE STATS</div>
+    </div>
+    <button class="lab-close-btn" onclick="closeLab()">✕ CLOSE LAB</button>
+  </header>
+
+  <div class="lab-body">
+    <!-- PERF COLUMN -->
+    <div class="lab-col">
+      <div class="lab-col-hdr" style="color:var(--orange)">Performance Configuration</div>
+      <div id="labPerfFields"></div>
+    </div>
+
+    <!-- STYLE COLUMN -->
+    <div class="lab-col">
+      <div class="lab-col-hdr" style="color:#aa44ff">Aesthetics Configuration</div>
+      <div id="labStyleFields"></div>
+    </div>
+
+    <!-- STATS COLUMN -->
+    <div class="lab-col" style="border-left:1px solid var(--border)">
+      <div class="lab-col-hdr" style="color:var(--gold)">Live Statistics</div>
+      <div id="labStats"></div>
+      <button class="find-btn" onclick="runCarMatch()">🔍 FIND MATCHING CARS</button>
+    </div>
+  </div>
+
+  <!-- MATCH RESULTS -->
+  <div class="lab-results" id="labResults" style="display:none">
+    <div class="matches-title" id="matchTitle">Closest Real-World Cars to Your Configuration</div>
+    <div class="match-grid" id="matchGrid"></div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div id="reviewModal">
+  <div class="review-box">
+    <button class="review-close" onclick="closeReview()">✕</button>
+    <div class="review-cat" id="reviewCat">CATEGORY</div>
+    <div class="review-val" id="reviewVal">—</div>
+    <div class="review-desc" id="reviewDesc">—</div>
+    <div class="review-tier" id="reviewTierBadge">TIER</div>
+    <div class="review-locked" id="reviewLocked"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   TIER SYSTEM
+══════════════════════════════════════════════════════════ */
+const TIER = {
+  F:{c:'#555555',score:0}, D:{c:'#cc4444',score:1}, C:{c:'#44aa44',score:2},
+  B:{c:'#4488ff',score:3}, A:{c:'#ffcc00',score:4}, S:{c:'#ff7700',score:5},
+  SS:{c:'#ff2277',score:6}, SSS:{c:'#bb44ff',score:7}
+};
+const TIER_FILL = {F:'#181818',D:'#2a1212',C:'#122212',B:'#121222',A:'#24200a',S:'#28140a',SS:'#280a18',SSS:'#180a2a'};
+
+/* Short label map for bottom tray dots */
+const DOT_LABELS = {
+  disp:'Engine', layout:'Config', asp:'Aspiration', fuel:'Fuel',
+  vtrain:'Valvetrain', tx:'Gearbox', drive:'Drivetrain', diff:'Diff',
+  susp:'Suspension', brakes:'Brakes', exhaust:'Exhaust', chassis:'Chassis',
+  bodykit:'Bodykit', rims:'Wheels', stance:'Stance', paint:'Paint',
+  interior:'Interior', wing:'Wing', lights:'Lighting', tint:'Tint',
+  carbon:'Carbon', branding:'Badging'
+};
+
+/* ══════════════════════════════════════════════════════════
+   WHEEL DEFINITIONS  (22 wheels)
+══════════════════════════════════════════════════════════ */
+const WHEELS = [
+/* 0 ─ DISPLACEMENT */
+{
+  id:'disp', name:'Engine Displacement', emoji:'🏛', dependsOn:[],
+  sub:'The cubic centimetres that define your destiny. Everything flows from here.',
+  opts:[
+    {l:'660cc Kei',   v:660,   tier:'F',   p:16, s:'660cc', desc:'47hp JDM legal cap. Bless your kei soul.'},
+    {l:'1.0L',        v:1000,  tier:'F',   p:13, s:'1.0L',  desc:'Three-pot poverty spec. The econobox experience.'},
+    {l:'1.2L',        v:1200,  tier:'D',   p:11, s:'1.2L',  desc:'City car territory. Barely a heartbeat.'},
+    {l:'1.4L',        v:1400,  tier:'D',   p:10, s:'1.4L',  desc:'Base spec fodder. Golf Mk1 energy.'},
+    {l:'1.6L',        v:1600,  tier:'C',   p:9,  s:'1.6L',  desc:'Honda B16 NA sweet spot. Respectful.'},
+    {l:'1.8L',        v:1800,  tier:'C',   p:8,  s:'1.8L',  desc:'Sensible. Reliable. Commuter spec.'},
+    {l:'2.0L',        v:2000,  tier:'C',   p:8,  s:'2.0L',  desc:'Turbo gold standard. 2JZ conceptually begins here.'},
+    {l:'2.5L',        v:2500,  tier:'B',   p:7,  s:'2.5L',  desc:'EJ257 / EJ25 WRX STI territory. Flat-5 Audi land.'},
+    {l:'3.0L',        v:3000,  tier:'B',   p:7,  s:'3.0L',  desc:'Inline-6 perfection. B58/S58 zone.'},
+    {l:'3.5L',        v:3500,  tier:'A',   p:5,  s:'3.5L',  desc:'V6/V8 battleground. 2UR-GSE philosophy.'},
+    {l:'4.0L',        v:4000,  tier:'A',   p:3,  s:'4.0L',  desc:'GT3 RS. M3 E46 CSL. The golden ratio.'},
+    {l:'5.0L',        v:5000,  tier:'S',   p:1.5,s:'5.0L',  desc:'Coyote V8. Lexus LC500. Americana displacement therapy.'},
+    {l:'6.2L',        v:6200,  tier:'SS',  p:0.8,s:'6.2L',  desc:'LS3 / Hellcat / Z06. American displacement maximalism.'},
+    {l:'7.0L+',       v:7000,  tier:'SSS', p:0.7,s:'7.0L+', desc:'Viper V10. LS7 Z06. Maximum irresponsibility.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 1 ─ ENGINE LAYOUT */
+{
+  id:'layout', name:'Engine Configuration', emoji:'🔩', dependsOn:['disp'],
+  sub:'Cylinder architecture. Your pistons are arranged. Your fate is crystallised.',
+  opts:[
+    {l:'Inline-2 (I2)',      v:'I2',  tier:'F',   p:4,   s:'I2',   desc:'Parallel-twin donk. Borrowed from motorcycles.', mnD:0,   mxD:800},
+    {l:'Inline-3 (I3)',      v:'I3',  tier:'D',   p:14,  s:'I3',   desc:'3-cyl character. Ford EcoBoost, Suzuki energy.',  mnD:500, mxD:1800},
+    {l:'Inline-4 (I4)',      v:'I4',  tier:'C',   p:28,  s:'I4',   desc:'The workhorse. K-series, B-series, 2JZ-adjacent.', mnD:1000,mxD:2800},
+    {l:'Inline-5 (I5)',      v:'I5',  tier:'B',   p:4,   s:'I5',   desc:'Audi RS3. Volvo. Five-pot chaos. Love it.',        mnD:2000,mxD:2800},
+    {l:'Inline-6 (I6)',      v:'I6',  tier:'A',   p:7,   s:'I6',   desc:'Silk-smooth perfection. 2JZ. B58. S58. The choice.',mnD:2500,mxD:4200},
+    {l:'Flat-4 Boxer',       v:'F4',  tier:'C',   p:5,   s:'Flat4', desc:'Subaru DNA. Low CG. Understeer enthusiast special.',mnD:1500,mxD:2700},
+    {l:'Flat-6 Boxer',       v:'F6',  tier:'S',   p:3,   s:'Flat6', desc:'Porsche 911. GT3. Howling NA perfection.',          mnD:2800,mxD:4200},
+    {l:'V6',                 v:'V6',  tier:'B',   p:12,  s:'V6',   desc:'Ferrari V6 to Japan mundane. Variable quality.',   mnD:2400,mxD:4500},
+    {l:'V8',                 v:'V8',  tier:'SS',  p:4,   s:'V8',   desc:'The Godfather configuration. LS. Coyote. Ferrari base.', mnD:3500,mxD:9999},
+    {l:'V10',                v:'V10', tier:'SS',  p:1.5, s:'V10',  desc:'Lambo Huracán. Audi R8. BMW M5 E60.',             mnD:4500,mxD:9999},
+    {l:'V12',                v:'V12', tier:'SS',  p:0.8, s:'V12',  desc:'Ferrari 812. SVJ. DB11. Maximum combustion.',     mnD:5500,mxD:9999},
+    {l:'W12',                v:'W12', tier:'SSS', p:0.5, s:'W12',  desc:'Bentley / VW. Two V6s violently married.',        mnD:5500,mxD:7500},
+    {l:'W16 Quad-Turbo',     v:'W16', tier:'SSS', p:0.2, s:'W16',  desc:'Bugatti only. The apex of absurdity. SF material.',mnD:6500,mxD:9999},
+  ],
+  filter:(o,s)=>{
+    const d=s.disp.v;
+    return o.filter(x=>{
+      if(x.mnD&&d<x.mnD)return false;
+      if(x.mxD&&d>x.mxD)return false;
+      if(x.v==='I2'&&d>900)return false;
+      if(x.v==='I3'&&d>1900)return false;
+      return true;
+    });
+  },
+},
+
+/* 2 ─ ASPIRATION */
+{
+  id:'asp', name:'Aspiration System', emoji:'💨', dependsOn:['disp','layout'],
+  sub:'Forced induction or NA purity. The lungs of your build.',
+  opts:[
+    {l:'Naturally Aspirated',     v:'NA',  tier:'D',   p:32, s:'N/A',   desc:'Pure air, no boost. High-rev screaming optional.', pm:1.0},
+    {l:'Diesel TDI/CDI',          v:'TDI', tier:'F',   p:9,  s:'TDI',   desc:'Torque-first, MPG-first. Diesel culture is real.', pm:0.72},
+    {l:'Single Turbo',            v:'ST',  tier:'C',   p:22, s:'1×T',   desc:'The classic boost delivery. Lag is the experience.', pm:1.45},
+    {l:'Twin-Scroll Turbo',       v:'TST', tier:'B',   p:12, s:'TS-T',  desc:'Faster spool, reduced lag. Modern performance standard.', pm:1.62},
+    {l:'Supercharged (TVS/Roots)',v:'SC',  tier:'A',   p:9,  s:'SC',    desc:'Belt-driven boost. Instant response. That whine.', pm:1.50},
+    {l:'Twin Turbo',              v:'TT',  tier:'S',   p:8,  s:'2×T',   desc:'Sequential or parallel. Biturbo madness. GTR vibes.', pm:1.82},
+    {l:'Twincharged (SC+Turbo)',  v:'TC',  tier:'SS',  p:3,  s:'TC',    desc:'The unholy marriage. Lancia Delta S4 / VW 1.4 TSI.', pm:2.12},
+    {l:'Anti-Lag + Single Turbo', v:'ALT', tier:'SS',  p:2.5,s:'ALT',   desc:'Full WRC spec. Popping, banging. Your neighbours hate you.', pm:1.72},
+    {l:'Quad-Turbo',              v:'QT',  tier:'SSS', p:1.5,s:'4×T',   desc:'Four snails feeding one engine. Bugatti Chiron. Peak absurdity.', pm:2.55},
+  ],
+  filter:(o,s)=>{
+    const d=s.disp.v, ly=s.layout.v;
+    return o.filter(x=>{
+      if(x.v==='TDI'&&(d<1400||d>4200))return false;
+      if(x.v==='TDI'&&!['I4','I6','V6'].includes(ly))return false;
+      if(x.v==='QT'&&d<5000)return false;
+      if(x.v==='QT'&&!['V8','V10','V12','W12','W16'].includes(ly))return false;
+      if(x.v==='TT'&&d<2000)return false;
+      if(x.v==='ALT'&&d<1600)return false;
+      if(x.v==='TC'&&(d<1200||d>3500))return false;
+      if(x.v==='SC'&&d<1500)return false;
+      if(x.v==='TST'&&d<1600)return false;
+      return true;
+    });
+  },
+},
+
+/* 3 ─ FUEL SYSTEM */
+{
+  id:'fuel', name:'Fuel Delivery System', emoji:'⛽', dependsOn:['asp'],
+  sub:'How the mixture reaches the combustion chamber. Atomisation is everything.',
+  opts:[
+    {l:'Carbureted (SU/Weber)',   v:'Carb', tier:'F',   p:8,  s:'Carb',  desc:'Vintage tech. Requires skill. Or luck. Usually luck.'},
+    {l:'Throttle Body Injection', v:'TBI',  tier:'D',   p:10, s:'TBI',   desc:'Single-point injection. Late 80s cost-cutting solution.'},
+    {l:'Multi-Port MPFI',         v:'MPFI', tier:'C',   p:25, s:'MPFI',  desc:'Each cylinder gets its own injector. Baseline modern.'},
+    {l:'Direct Injection GDI',    v:'GDI',  tier:'B',   p:24, s:'GDI',   desc:'Injected into combustion chamber. FSI/TSI/TFSI territory.'},
+    {l:'Port + Direct (D-MPFI)',  v:'DUAL', tier:'A',   p:17, s:'D-FI',  desc:'Best of both worlds. Toyota D-4ST. Ford dual injection.'},
+    {l:'Individual Throttle Bodies',v:'ITB',tier:'S',   p:8,  s:'ITBs',  desc:'One TB per cylinder. Ferrari/BMW S65. Carburetion refined.'},
+    {l:'Mech. Injection (Bosch)', v:'MFI',  tier:'SS',  p:3,  s:'MFI',   desc:'Kugelfischer. Bosch K-Jetronic. Vintage motorsport gold.'},
+    {l:'Racing Stack Injection',  v:'Stack',tier:'SSS', p:2,  s:'Stack',  desc:'Full race prep. Individual stacks. DTM/Le Mans homologation.'},
+    {l:'Bioethanol E85 Direct',   v:'E85',  tier:'S',   p:3,  s:'E85',   desc:'113 octane effective rating. Flex-fuel pro tuner choice.'},
+  ],
+  filter:(o,s)=>{
+    const a=s.asp.v;
+    return o.filter(x=>{
+      if(x.v==='Carb'&&['TT','TC','QT','TST','ALT'].includes(a))return false;
+      if(x.v==='Stack'&&['QT','TDI'].includes(a))return false;
+      if(a==='TDI'&&['Carb','TBI','ITB','MFI','Stack','E85'].includes(x.v))return false;
+      if(x.v==='ITB'&&['TT','TC','QT','ALT'].includes(a))return false;
+      return true;
+    });
+  },
+},
+
+/* 4 ─ VALVETRAIN */
+{
+  id:'vtrain', name:'Valvetrain Technology', emoji:'🔄', dependsOn:['layout'],
+  sub:'How your valves breathe. VTEC, VANOS, Desmodromic — the lunatics made them all.',
+  opts:[
+    {l:'Pushrod OHV (Fixed)',        v:'OHV',    tier:'D',   p:12, s:'OHV',    desc:'LS engine territory. Retro, torquey, shockingly works.'},
+    {l:'SOHC Fixed Timing',          v:'SOHC',   tier:'D',   p:14, s:'SOHC',   desc:'Single overhead cam. Zero variable timing. Uninspired.'},
+    {l:'DOHC Fixed Timing',          v:'DOHC',   tier:'C',   p:16, s:'DOHC',   desc:'Four-valve per cylinder base. Solid, uninspired foundation.'},
+    {l:'DOHC + Intake VVT (iVVT-i)', v:'iVVT',   tier:'C',   p:18, s:'iVVT',   desc:'Variable timing intake only. Toyota VVT-i. Entry-level clever.'},
+    {l:'DOHC Dual VVT (VANOS/DVVT)', v:'DVVT',   tier:'B',   p:16, s:'DVVT',   desc:'Both cams variable. Double VANOS. BMW S-series DNA.'},
+    {l:'DOHC + VVL (VTEC/VVTL-i)',   v:'VVL',    tier:'A',   p:10, s:'VVL',    desc:'Variable valve lift. That VTEC kick. High-rev theatre.'},
+    {l:'Fully Variable (Valvetronic)',v:'ValvTr', tier:'S',   p:6,  s:'ValvTr', desc:'BMW Valvetronic. No throttle plate. Pure airflow control.'},
+    {l:'Pneumatic Valvetrain',        v:'Pneum',  tier:'SS',  p:2,  s:'Pneum',  desc:'F1/LMP prototype. No spring return. High-RPM capable.'},
+    {l:'Desmodromic (Ducati-derived)',v:'Desmo',  tier:'SSS', p:1.5,s:'Desmo',  desc:'Forced valve closure. Ducati tech adapted to 4-wheel. Heresy.'},
+    {l:'Freevalve (Camless Electro)', v:'Free',   tier:'SSS', p:0.5,s:'FreeVlv',desc:'No camshaft whatsoever. Koenigsegg research applied. SF.'},
+  ],
+  filter:(o,s)=>{
+    const ly=s.layout.v;
+    return o.filter(x=>{
+      if(x.v==='OHV'&&!['V8','V6'].includes(ly))return false;
+      if(x.v==='Pneum'&&!['V8','V10','V12','F6'].includes(ly))return false;
+      return true;
+    });
+  },
+},
+
+/* 5 ─ TRANSMISSION */
+{
+  id:'tx', name:'Gearbox / Transmission', emoji:'⚙️', dependsOn:['disp','asp'],
+  sub:'The power translator. How your engine communicates with the driven wheels.',
+  opts:[
+    {l:'3-Speed Automatic',        v:'3AT', tier:'F',   p:5,   s:'3-AT',  desc:'Vintage slushbox. Kei territory. Shift at 3000rpm pls.', mxHP:120},
+    {l:'4-Speed Automatic',        v:'4AT', tier:'F',   p:8,   s:'4-AT',  desc:'Economy spec. Grandmother approved. Deeply sad.',       mxHP:200},
+    {l:'CVT (Steel-Belt)',          v:'CVT', tier:'D',   p:14,  s:'CVT',   desc:'The drain-plug of driving joy. Efficient, soulless.',   mxHP:280},
+    {l:'5-Speed Manual',           v:'5MT', tier:'C',   p:14,  s:'5-MT',  desc:'Five ratios, a clutch pedal, and a determination.'},
+    {l:'6-Speed Torque Conv. Auto',v:'6AT', tier:'C',   p:12,  s:'6-AT',  desc:'Mainstream modern auto. Honda 6-speed, BMW 6A.'},
+    {l:'6-Speed Manual',           v:'6MT', tier:'B',   p:11,  s:'6-MT',  desc:"Driver's gearbox. Heel-toe is now mandatory."},
+    {l:'7-Speed PDK / DCT',        v:'7DCT',tier:'A',   p:10,  s:'7-PDK', desc:'Porsche PDK / Mercedes 7G-DCT. Fast. Soul debate rages on.'},
+    {l:'8-Speed ZF Automatic',     v:'8ZF', tier:'A',   p:9,   s:'8-ZF',  desc:'ZF 8HP — the gold standard automatic. BMWs live here.'},
+    {l:'10-Speed Auto (GM/Ford)',   v:'10AT',tier:'A',   p:3,   s:'10-AT', desc:'Hellcat/Raptor spec. Comically comprehensive ratio coverage.', mnHP:380},
+    {l:'6-Speed Dog-Ring Sequential',v:'6Seq',tier:'SS',p:2.5, s:'6-SEQ', desc:'Flat-shift capable. No synchromesh. No mercy. Loud.'},
+    {l:'7-Speed AMG MCT',          v:'7MCT',tier:'SS',  p:1.5, s:'7-MCT', desc:'Multi-Clutch Transmission. AMG GT / C63 spec.', mnHP:400},
+    {l:'Xtrac 6-Speed (FIA Race)', v:'Xtrac',tier:'SSS',p:0.7, s:'XTRAC', desc:'Full FIA motorsport transaxle. 80ms shifts. Requires cage.', mnHP:300},
+  ],
+  filter:(o,s)=>{
+    const hp=estHP(s);
+    return o.filter(x=>{
+      if(x.mxHP&&hp>x.mxHP)return false;
+      if(x.mnHP&&hp<x.mnHP)return false;
+      return true;
+    });
+  },
+},
+
+/* 6 ─ DRIVETRAIN */
+{
+  id:'drive', name:'Drivetrain Layout', emoji:'🚗', dependsOn:['layout','asp','tx'],
+  sub:'Which wheels receive motivation. Physics determines your cornering destiny.',
+  opts:[
+    {l:'FWD (Front-Wheel Drive)',     v:'FWD',    tier:'D',   p:28, s:'FWD',    desc:"Understeer city. Ideal for laptops and grocery runs."},
+    {l:'RWD (Rear-Wheel Drive)',      v:'RWD',    tier:'A',   p:22, s:'RWD',    desc:"The purist's line. Oversteer potential. Driving school advised."},
+    {l:'AWD Haldex (Clutch-Pack)',    v:'AWDH',   tier:'B',   p:17, s:'AWD-H',  desc:'Mostly FWD with AWD when needed. VW/Audi Haldex system.'},
+    {l:'AWD Symmetrical (Subaru)',    v:'AWDS',   tier:'A',   p:12, s:'AWD-S',  desc:'True symmetrical AWD. Rally car engineering heritage.'},
+    {l:'AWD Torque Vectoring',        v:'AWDTV',  tier:'SS',  p:6,  s:'AWD-TV', desc:'Per-wheel torque. Nissan GT-R philosophy. Godlike grip.'},
+    {l:'Part-Time 4WD (Hi/Lo)',       v:'4WD',    tier:'C',   p:10, s:'4WD',    desc:'Off-road capable. Selectable high/low range. Practical.'},
+    {l:'AWD + Drift Mode',            v:'DriftAWD',tier:'SSS',p:2,  s:'Drift-AWD',desc:'BMW M xDrive philosophy. AWD then RWD on command.', mnHP:350},
+    {l:'Mid-Engine RWD (MR)',         v:'MR',     tier:'S',   p:3,  s:'MR',     desc:'Mid rear. Perfect weight distribution. Ferrari-esque.'},
+  ],
+  filter:(o,s)=>{
+    const hp=estHP(s), ly=s.layout.v, t=s.tx.v;
+    return o.filter(x=>{
+      if(x.v==='FWD'&&['V8','V10','V12','W12','W16'].includes(ly))return false;
+      if(x.v==='FWD'&&hp>420)return false;
+      if(x.mnHP&&hp<x.mnHP)return false;
+      if(t==='CVT'&&['RWD','MR','DriftAWD'].includes(x.v))return false;
+      return true;
+    });
+  },
+},
+
+/* 7 ─ DIFFERENTIAL */
+{
+  id:'diff', name:'Differential System', emoji:'⚡', dependsOn:['drive'],
+  sub:'The torque distribution oracle. Open or locked — your exit-speed destiny.',
+  opts:[
+    {l:'Open Differential',          v:'Open',    tier:'F',   p:22, s:'Open',    desc:'One wheel spins. The other cries. No LSD = no dignity.'},
+    {l:'Viscous LSD',                v:'VLSD',    tier:'C',   p:18, s:'VLSD',    desc:'Silicone fluid coupling. Better than open. Marginally.'},
+    {l:'Helical Gear LSD (Torsen A)',v:'HLSD',    tier:'B',   p:14, s:'H-LSD',   desc:'Self-locking under power. No clutch wear. Clean solution.'},
+    {l:'Plate-Type Mechanical LSD',  v:'MLSD',    tier:'B',   p:12, s:'M-LSD',   desc:'Clutch-pack bite. Rally spec. Service interval reminder.'},
+    {l:'Torsen T-2R Worm-Gear',      v:'T2R',     tier:'A',   p:10, s:'T-2R',    desc:'Audi Sport Quattro spec. Smart passive lockup. Silent.'},
+    {l:'Electronic Clutch-Pack LSD', v:'ELSD',    tier:'A',   p:8,  s:'eLSD',    desc:'True clutch electronic. Not just braking the wheel.'},
+    {l:'Active Yaw Control (AYC)',   v:'AYC',     tier:'SS',  p:5,  s:'AYC',     desc:'Mitsubishi Evo philosophy. Yaw-rate feedback. Rally gold.'},
+    {l:'Twin-Clutch Torque Vectoring',v:'TCTV',   tier:'SS',  p:4,  s:'TC-TV',   desc:'McLaren ProActive / Ford Performance. Per-axle torque.'},
+    {l:'Electromag. Diff (e-diff)',  v:'EMAG',    tier:'SSS', p:2,  s:'MAGdiff', desc:'Ferrari e-diff. Magnetic actuators. SF territory.'},
+    {l:'Drift Spool (Full Lock)',     v:'Spool',   tier:'C',   p:5,  s:'Spool',   desc:'Fully welded / locked. Both wheels turn together. Track only.'},
+  ],
+  filter:(o,s)=>{
+    const dt=s.drive.v;
+    return o.filter(x=>{
+      if(dt==='FWD'&&['AYC','Spool','T2R','TCTV'].includes(x.v))return false;
+      if(x.v==='Spool'&&!['RWD','MR'].includes(dt))return false;
+      return true;
+    });
+  },
+},
+
+/* 8 ─ SUSPENSION */
+{
+  id:'susp', name:'Suspension Architecture', emoji:'🦾', dependsOn:['drive'],
+  sub:'How your chassis talks to tarmac. Compliance vs. control. Always both.',
+  opts:[
+    {l:'MacPherson / Torsion Beam',   v:'MTB',    tier:'D',   p:20, s:'McP/TB',  desc:'Hot hatch standard. Limited rear articulation.'},
+    {l:'MacPherson / Multi-Link',     v:'MML',    tier:'C',   p:18, s:'McP/ML',  desc:'Decent compromise. Honda Civic Si baseline.'},
+    {l:'MacPherson / Double Wishbone',v:'MDWB',   tier:'B',   p:10, s:'McP/DWB', desc:'Economy front, capable rear. Credible setup.'},
+    {l:'DWB Front + Multi-Link Rear', v:'DWBML',  tier:'B',   p:12, s:'DWB/ML',  desc:'Honda NSX-style front. Rear multi-link. Balanced.'},
+    {l:'DWB Front + DWB Rear',        v:'DWBDWB', tier:'A',   p:10, s:'DWB/DWB', desc:'Full double wishbone. Proper sports car tuning.'},
+    {l:'Multi-Link All Around',       v:'MLML',   tier:'A',   p:9,  s:'ML/ML',   desc:'Mercedes / 5-series GT standard. Refined accuracy.'},
+    {l:'Air Suspension (Adaptive)',   v:'Air',    tier:'C',   p:7,  s:'Air',     desc:'Height-adjustable. Also ruinously expensive when failed.'},
+    {l:'Pushrod-Rocker (Motorsport)', v:'Push',   tier:'SS',  p:4,  s:'Pushrod', desc:'F1/LMP/GT3-derived. Inboard dampers. Track builds only.'},
+    {l:'Hydraulic Active (Citroen)',  v:'Hydro',  tier:'SS',  p:3,  s:'Hydro',   desc:'Hydractive/PSS. Zero body roll achievable. French genius.'},
+    {l:'Electromagnetic Active',      v:'EMAct',  tier:'SSS', p:1.5,s:'EMAct',   desc:'Bose / Ferrari Multimatic style. Black magic ride control.'},
+    {l:'Full Race Geometry (Sphericals)',v:'Race', tier:'SSS', p:0.5,s:'Race-Geo', desc:'Spherical bearings throughout. Zero compliance. 100% feel.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 9 ─ BRAKES */
+{
+  id:'brakes', name:'Braking System', emoji:'🔴', dependsOn:['asp'],
+  sub:'Stopping is just as engineered as going. Most people forget this.',
+  opts:[
+    {l:'Drum / Drum (Full Drum)',      v:'DD',    tier:'F',   p:5,  s:'Drum/D',  desc:'Complete drum brakes. 1960s tech. Significant fade. No.', mxHP:100},
+    {l:'Disc / Drum',                  v:'DiscDr',tier:'D',   p:12, s:'D/Drum',  desc:'Front disc, rear drum. Budget acceptable for street.',    mxHP:180},
+    {l:'Single-Piston Disc/Disc',      v:'1P',    tier:'D',   p:18, s:'1-pot',   desc:'Floating caliper all around. Marginally better.'},
+    {l:'Dual-Piston Disc/Disc',        v:'2P',    tier:'C',   p:16, s:'2-pot',   desc:'More piston area, better modulation. A step up.'},
+    {l:'Brembo 4-Pot Monoblock',       v:'B4',    tier:'B',   p:14, s:'Brembo4', desc:'The aftermarket staple. Brembo 4-pot. It works.'},
+    {l:'Brembo 6-Pot Monoblock',       v:'B6',    tier:'A',   p:8,  s:'Brembo6', desc:'Factory supercar fitment. Massive bite. Excellent feel.', mnHP:280},
+    {l:'AP Racing Radi-CAL 6-Pot',     v:'AP6',   tier:'S',   p:6,  s:'AP-6p',   desc:'GT race-derived. Radial mount caliper. Full track duty.', mnHP:350},
+    {l:'Carbon-Ceramic (Brembo CCM)',  v:'CCM',   tier:'SS',  p:5,  s:'CCM',     desc:'Carbon-ceramic discs. No fade. £10k replacement. Choose wisely.', mnHP:400},
+    {l:'Brembo CCM-R (Race Ceramic)',  v:'CCMR',  tier:'SSS', p:2,  s:'CCM-R',   desc:'FXX K / 918 spec. Cold=useless. Hot=divine. Pre-warm required.', mnHP:500},
+    {l:'Sintered Steel Race Pads',     v:'Race',  tier:'S',   p:4,  s:'Race-Pad',desc:'Pagid RS29 / Ferodo DS3000. Squeal cold, grip hot.', mnHP:250},
+  ],
+  filter:(o,s)=>{
+    const hp=estHP(s);
+    return o.filter(x=>{
+      if(x.mxHP&&hp>x.mxHP)return false;
+      if(x.mnHP&&hp<x.mnHP)return false;
+      return true;
+    });
+  },
+},
+
+/* 10 ─ EXHAUST */
+{
+  id:'exhaust', name:'Exhaust System', emoji:'💥', dependsOn:['asp','layout'],
+  sub:'Where combustion gas exits the party. Sound is the soul made audible.',
+  opts:[
+    {l:'Stock Catalytic Converter',     v:'Stock',   tier:'F',   p:18, s:'Stock',    desc:'OEM spec. Catalytic bricks. Minimum noise. Miserable.'},
+    {l:'Cat-Back + Aftermarket Tip',    v:'CatBk',   tier:'C',   p:18, s:'Cat-Bk',   desc:'The gateway mod. Flowmaster/Borla/MagnaFlow. Entry.'},
+    {l:'Axle-Back + Valved Cutout',     v:'AxleV',   tier:'C',   p:12, s:'Axle-V',   desc:'Valve-controlled acoustics. Quiet or savage on demand.'},
+    {l:'Turbo-Back Full Exhaust',        v:'TBk',     tier:'B',   p:12, s:'T-Back',   desc:'From turbine exit to tips. Matched downpipe. Full flow.'},
+    {l:'Equal-Length Headers + Cat-Bk', v:'EqLen',   tier:'A',   p:9,  s:'EqLen',    desc:'Tuned primaries. Scavenging. S2000-style screaming.'},
+    {l:'Full Titanium System',           v:'Ti',      tier:'A',   p:8,  s:'Ti-sys',   desc:'Akrapovic / Capristo full titanium. Weight saving. Cost pain.'},
+    {l:'Valved Active + EqLen Headers',  v:'ValvEq',  tier:'S',   p:6,  s:'Vl+EqL',  desc:'Active valve headers + bi-modal exhaust. Ferrari 488 style.'},
+    {l:'Titanium + Anti-Lag Screamer',   v:'ALscr',   tier:'SS',  p:4,  s:'ALscr',    desc:'Rally-bred. Flame on throttle lift. WRC noise levels.'},
+    {l:'Full Straight-Pipe (No Cat)',    v:'Str8',    tier:'SS',  p:5,  s:'Str8',     desc:'Zero restriction. Zero cats. Maximum neighbours fury.'},
+    {l:'Full Inconel Race Exhaust',      v:'Inconel', tier:'SSS', p:2,  s:'Inconel',  desc:'Le Mans / Formula spec. 1200°C rated. NASA-grade alloy.'},
+    {l:'Side-Exit Race Exhaust',         v:'SideEx',  tier:'SSS', p:1,  s:'Side-Ex',  desc:'Cobra / GT40 / Viper. Exits beside the door. Passenger roasting.'},
+  ],
+  filter:(o,s)=>{
+    const a=s.asp.v, ly=s.layout.v;
+    return o.filter(x=>{
+      if(x.v==='TBk'&&!['ST','TST','TT','TC','QT','ALT'].includes(a))return false;
+      if(x.v==='ALscr'&&!['ST','TST','TT','TC','QT','ALT'].includes(a))return false;
+      if(x.v==='SideEx'&&!['V8','V10','V12','W12'].includes(ly))return false;
+      return true;
+    });
+  },
+},
+
+/* 11 ─ CHASSIS */
+{
+  id:'chassis', name:'Chassis Construction', emoji:'🏗', dependsOn:[],
+  sub:'What the car is actually made from. Rigidity and mass are the final battleground.',
+  opts:[
+    {l:'Stamped Steel Unibody',          v:'Steel',  tier:'D',   p:28, s:'Steel',    desc:'Majority of production cars. Heavy. Front crush zones.'},
+    {l:'High-Strength Steel Unibody',    v:'HSS',    tier:'C',   p:22, s:'HSS',      desc:'HSSs spot-welded. BIW rib reinforcements. GTI / M235 territory.'},
+    {l:'Space Frame + Glassfibre Body',  v:'SpGF',   tier:'B',   p:14, s:'SpFr-GF',  desc:'Lotus Elise concept. Extruded alu + GRP body. Lightweight ethos.'},
+    {l:'Aluminium Intensive Monocoque',  v:'AluMon', tier:'A',   p:12, s:'Alu-Mon',  desc:'Audi A8 / Jaguar XE spec. Riveted + bonded. ~25% lighter.'},
+    {l:'CFRP-Reinforced Body Structure', v:'CFRP',   tier:'A',   p:8,  s:'CFRP',     desc:'BMW M4 CFRP roof + carbon struts. Partial CF reinforcement.'},
+    {l:'Hybrid CF / Aluminium Frame',    v:'HybCF',  tier:'S',   p:6,  s:'Hyb-CF',   desc:'McLaren MonoCell II-T adjacent. Partial tub, alu crash structure.'},
+    {l:'Full Carbon Monocoque',          v:'FullCF', tier:'SS',  p:5,  s:'Full-CF',  desc:'Lamborghini / McLaren Senna. Full CF tub. Uncompromised.'},
+    {l:'Titanium + Carbon Race Tub',     v:'TiCF',   tier:'SSS', p:3,  s:'Ti+CF',    desc:'Porsche 918 / LaFerrari hypercar spec. Ultimate stiffness:weight.'},
+    {l:'RTM Carbon Tub (iStream)',       v:'RTM',    tier:'SSS', p:2,  s:'RTM-CF',   desc:'Gordon Murray T.50 spec. Resin-Transfer Moulded carbon. SF.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* ═══════════════════ AESTHETICS PHASE (wheels 12-21) ═══════════════════ */
+
+/* 12 ─ BODY KIT */
+{
+  id:'bodykit', name:'Body Kit / Aero Package', emoji:'✨', dependsOn:[],
+  sub:'Visual aggression level. From clean sleeper to RAUH-Welt philosophy.',
+  opts:[
+    {l:'Stock / Unmodified',             v:'Stock',  tier:'D',   p:28, s:'Stock',  desc:'Factory spec. Zero visual drama. The sleeper foundation.'},
+    {l:'OEM+ Lip Kit',                   v:'OEMp',   tier:'C',   p:18, s:'OEM+',   desc:'Manufacturer accessory kit. Tasteful dealer-approved aggression.'},
+    {l:'Manufacturer Sport Body Pack',   v:'SportPk',tier:'C',   p:13, s:'Sport',  desc:'M-Sport / S-Line / Type-R aero. Subtle factory aggression.'},
+    {l:'JDM Variant Front Bumper Swap',  v:'JDMbmp', tier:'B',   p:10, s:'JDM-Bmp',desc:'JDM-spec bumper. The grey-market jealousy trigger.'},
+    {l:'Full Aftermarket Aero Kit',      v:'AftMkt', tier:'B',   p:9,  s:'Aft-Kit',desc:'Maxton / Mugen / TRD. Purpose-built and aggressive.'},
+    {l:'Rocket Bunny / Pandem Widebody', v:'RB',     tier:'A',   p:6,  s:'RB-Wide',desc:'Kei Miura overfenders. Stance culture royalty. JDM hallowed ground.'},
+    {l:'Liberty Walk LB-Works',          v:'LBW',    tier:'S',   p:5,  s:'LB-Walk',desc:'Wataru Kato signature cuts. Controversial. Always photographed.'},
+    {l:'GT Homologation Race Aero',      v:'GTHom',  tier:'SS',  p:4,  s:'GT-Hom', desc:'FIA/JGTC homologation. CFD-derived. Every surface earns downforce.'},
+    {l:'Full GT Race Aero Package',      v:'GTRace', tier:'SS',  p:3,  s:'GT-Race',desc:'WTCR/Super GT class. Massive splitter, diffuser, full canards.'},
+    {l:'RAUH-Welt Begriff (RWB)',         v:'RWB',    tier:'SSS', p:2,  s:'RWB',    desc:'Nakai-san hand-cut. One-of-one widebody. A religious experience.'},
+    {l:'One-Off Custom Fabricated Aero', v:'Custom', tier:'SSS', p:2,  s:'Custom', desc:'Bespoke aluminium aero. Pikes Peak / hill climb philosophy.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 13 ─ WHEELS */
+{
+  id:'rims', name:'Wheel & Rim Selection', emoji:'⭕', dependsOn:[],
+  sub:'Rolling art. Your choice of corner hardware defines the entire aesthetic.',
+  opts:[
+    {l:'Steel Steelies + Poverty Caps',  v:'Steels', tier:'F',   p:18, s:'Steel',  desc:'OEM steel wheels. Hubcap included. The unambiguous floor.'},
+    {l:'Basic OEM Alloys (Factory)',      v:'OEMAly', tier:'D',   p:15, s:'OEM-Aly',desc:'Factory alloys. Inoffensive. Default spec. Forgettable.'},
+    {l:'Generic Aftermarket Alloys',      v:'Generic',tier:'D',   p:12, s:'Generic',desc:'Aliexpress-adjacent. They fit. Best we can say.'},
+    {l:'OZ Racing Leggera / Superturismo',v:'OZ',     tier:'C',   p:10, s:'OZ-Rac', desc:'Italian lightweight. Popular tuner fitment. Respectable.'},
+    {l:'BBS RM / RS Two-Piece',          v:'BBS',    tier:'B',   p:9,  s:'BBS',    desc:'German engineering. Understated classic. Subtly brilliant.'},
+    {l:'Volk Racing TE37 (Rays)',         v:'TE37',   tier:'A',   p:7,  s:'TE37',   desc:'The unicorn wheel. Forged single-piece. JDM hallowed ground.'},
+    {l:'Work Meister S1 / CR-01',        v:'Work',   tier:'A',   p:6,  s:'Work-S1',desc:'Work Wheels Japan. 3-piece deep dish. Show-stopper spec.'},
+    {l:'HRE FlowForm / Forged Series',   v:'HRE',    tier:'S',   p:5,  s:'HRE',    desc:'California billet machined. Precision as an art form.'},
+    {l:'CCW Classics 3-Piece Billet',    v:'CCW',    tier:'SS',  p:2,  s:'CCW',    desc:'Centre-lock billet. The Pebble Beach concourse wheel.'},
+    {l:'OZ Ultraleggera HLT / CF Rim',   v:'UL_CF',  tier:'SS',  p:2,  s:'CF-Rim', desc:'Ultralight carbon-hybrid rim. Unsprung mass annihilation.'},
+    {l:'Custom Centre-Lock Race Wheel',  v:'CL_Race',tier:'SSS', p:1,  s:'CL-Race',desc:'Full motorsport centre-lock monoblock. FIA spec.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 14 ─ STANCE */
+{
+  id:'stance', name:'Stance & Ride Height', emoji:'📐', dependsOn:['susp'],
+  sub:'How your machine sits on Earth. Millimetres of drop define the statement.',
+  opts:[
+    {l:'Factory Stock Ride Height',       v:'Stock',  tier:'D',   p:28, s:'Stock',  desc:'Factory spec. Full bump clearance. Speed bumps: no problem.'},
+    {l:'20mm Performance Spring Drop',    v:'20mm',   tier:'D',   p:20, s:'-20mm',  desc:'Entry-level lowering. Stance by accident.'},
+    {l:'40mm Lowering Spring Set',        v:'40mm',   tier:'C',   p:15, s:'-40mm',  desc:'Stiffer, lower. Entry-level commitment. Progress.'},
+    {l:'Coilover Street Setup (KW/Tein)', v:'CoilSt', tier:'B',   p:12, s:'Coil-S', desc:'Street-dialled coilovers. Adjustable. The proper approach.'},
+    {l:'Coilover Full Track Alignment',   v:'CoilTk', tier:'A',   p:8,  s:'Coil-T', desc:'Corner-weighted. Aggressive camber. Functional and beautiful.'},
+    {l:'Static Slammed',                  v:'Slam',   tier:'B',   p:5,  s:'Slammed',desc:'Near-zero clearance. Looks incredible standing still.'},
+    {l:'Air Suspension Managed',          v:'AirMgd', tier:'A',   p:5,  s:'Air-Mgd',desc:'Adjustable on demand. Car show to highway in minutes.'},
+    {l:'Hellaflush (Maximum Poke)',        v:'Flush',  tier:'C',   p:4,  s:'hFlush', desc:'Aggressive offset. Max negative camber. Culture Marmite.'},
+    {l:'FIA Minimum Race Height',          v:'RaceH',  tier:'SS',  p:2,  s:'Race-H', desc:'Competition legal minimum. Ride is punishing. Times are quick.'},
+    {l:'Hydraulic Self-Levelling',         v:'HydroH', tier:'SSS', p:1,  s:'HydroH', desc:'Citroen Hydractive-inspired. Variable passive hydraulics. Witchcraft.'},
+  ],
+  filter:(o,s)=>{
+    return o.filter(x=>{
+      if(['Flush','Slam'].includes(x.v)&&['Push','Race'].includes(s.susp?.v))return false;
+      if(x.v==='RaceH'&&!['Push','Race','DWBDWB','MLML'].includes(s.susp?.v))return false;
+      if(x.v==='HydroH'&&s.susp?.v!=='Hydro')return false;
+      if(x.v==='AirMgd'&&s.susp?.v!=='Air')return false;
+      return true;
+    });
+  },
+},
+
+/* 15 ─ PAINT */
+{
+  id:'paint', name:'Paint & Wrap', emoji:'🎨', dependsOn:[],
+  sub:'Colour speaks before the engine does. Your canvas. Your statement.',
+  opts:[
+    {l:'Factory White / Silver',          v:'WhSlv',  tier:'D',   p:22, s:'Wh/Slv', desc:'The default. Safe. Resale-value approved. Forgettable.'},
+    {l:'Factory Black (Solid)',           v:'Black',  tier:'C',   p:16, s:'Black',   desc:'The classic. Hides panels. Shows every scratch. Bold.'},
+    {l:'Metallic OEM Factory Colour',     v:'Metal',  tier:'C',   p:14, s:'MetalOEM',desc:'OEM metallic. Subtle flake. Dealer-spec understated beauty.'},
+    {l:'Custom Single-Stage Respray',     v:'Respray',tier:'B',   p:11, s:'Respray', desc:'New colour. New identity. BASF / PPG mixed. Fresh start.'},
+    {l:'Matte / Satin Wrap (XPEL/3M)',   v:'MattWrp',tier:'B',   p:9,  s:'Matte',   desc:'Satin PPF or matte vinyl. Protection meets attitude.'},
+    {l:'Two-Tone Contrasting Paint',      v:'TwoTone',tier:'A',   p:7,  s:'2-Tone',  desc:'Contrasting roof / lower half. Intentional visual complexity.'},
+    {l:'Colour-Shift / Chameleon Flip',   v:'Chml',   tier:'A',   p:5,  s:'Chameleon',desc:'Shifts hue with viewing angle. Science applied as art.'},
+    {l:'Full Pearlescent Custom Mix',     v:'Pearl',  tier:'A',   p:4,  s:'Pearl',   desc:'Custom pearl mix. Depth changes under every light source.'},
+    {l:'Full Racing Livery (Painted)',    v:'Livery', tier:'SS',  p:2,  s:'Livery',  desc:'24 Hours Le Mans / WRC inspired. Number, sponsors, the works.'},
+    {l:'Exposed Bare Carbon (No Paint)',  v:'BareCF', tier:'SSS', p:1,  s:'BareC',   desc:'Raw CF weave under clearcoat. Most uncompromising aesthetic.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 16 ─ INTERIOR */
+{
+  id:'interior', name:'Interior Modification', emoji:'🪑', dependsOn:['drive'],
+  sub:'What the driver sees and feels. From OEM luxury to stripped race prep.',
+  opts:[
+    {l:'Stock OEM Interior',             v:'Stock',  tier:'D',   p:28, s:'Stock',   desc:'Factory spec. Miles of plastic. Cup holder present. Adequate.'},
+    {l:'Aftermarket Head Unit + Speakers',v:'HU',    tier:'D',   p:14, s:'HU/SPK',  desc:'Pioneer / Alpine install. Audio upgrade. Gateway mod.'},
+    {l:'Sport Steering Wheel (Nardi)',    v:'SportSW',tier:'C',   p:12, s:'Sport-SW',desc:'Smaller, dished, leather-wrapped. Airbag deleted. Drive carefully.'},
+    {l:'Single Bucket Seat (Driver)',     v:'BktSgl', tier:'C',   p:10, s:'Bkt-D',   desc:'Recaro / Bride driver seat. Passenger stays stock. Correct.'},
+    {l:'Dual Bucket Seat Set',            v:'BktDual',tier:'B',   p:9,  s:'Bkt-x2',  desc:'Full Recaro / Bride pair. Harness mounts recommended.'},
+    {l:'Full Alcantara Interior Retrim',  v:'Retrim', tier:'B',   p:7,  s:'Retrim',  desc:'Alcantara headliner, suede dash. Bespoke and purposeful.'},
+    {l:'OEM Premium Options Pack',        v:'OEMPrem',tier:'A',   p:4,  s:'OEM-Prm', desc:'Porsche SportChrono / BMW M Carbon / AMG Performance Pack.'},
+    {l:'Bolt-In Roll Bar (4-Point)',       v:'RollBar',tier:'A',   p:5,  s:'Roll-Bar',desc:'4-point roll bar. Some protection. Weld-in is always better.'},
+    {l:'Full Weld-In Roll Cage (FIA)',    v:'Cage',   tier:'S',   p:4,  s:'Cage',    desc:'Full FIA-spec cage. Complete driver cell. Helmet compulsory.'},
+    {l:'Strip-Out + Cage + 6pt Harness', v:'Strip',  tier:'SS',  p:4,  s:'Strip+Cage',desc:'No carpet. No deadening. Harness. Race-ready. Loud.'},
+    {l:'Custom Full Carbon Interior Trim',v:'CarbInt',tier:'SSS', p:2,  s:'CF-Int',  desc:'Billet knobs, CF dash, weave everywhere. Concours-grade.'},
+    {l:'FRP Panels + Full NVH Strip',    v:'NVH',    tier:'S',   p:1,  s:'NVH-Strip',desc:'NVH deleted entirely. FRP replaces metal. Pure speed focus.'},
+  ],
+  filter:(o,s)=>{
+    const dt=s.drive?.v;
+    return o.filter(x=>{
+      if(['Cage','Strip','NVH'].includes(x.v)&&dt==='FWD')return false;
+      return true;
+    });
+  },
+},
+
+/* 17 ─ WING */
+{
+  id:'wing', name:'Spoiler & Wing', emoji:'🏁', dependsOn:['bodykit'],
+  sub:'Downforce ambitions or clean aesthetics. The wing declares the intent.',
+  opts:[
+    {l:'No Wing (Flush / Deleted)',       v:'None',   tier:'C',   p:26, s:'Clean',   desc:'Deleted or never had one. The sleeper look. Understated.'},
+    {l:'Lip Spoiler (Factory Recess)',    v:'Lip',    tier:'C',   p:20, s:'Lip',     desc:'Factory lip. Minimal statement. Optional elegance.'},
+    {l:'OEM Sport Spoiler',               v:'OEMSp',  tier:'B',   p:15, s:'OEM-Sp',  desc:'Optional OEM sport spoiler. Type-R / Golf GTI / M3 spec.'},
+    {l:'Ducktail Spoiler',                v:'Duck',   tier:'B',   p:10, s:'Ducktail',desc:'Porsche 930 influence. Short, arching. Gentleman wing.'},
+    {l:'Aftermarket GT Wing (FRP/Alu)',   v:'GTWing', tier:'A',   p:8,  s:'GT-Wing', desc:'Aluminium / FRP GT wing. Street aggression. Mostly visual.'},
+    {l:'Carbon Fibre GT Wing',            v:'CFWing', tier:'S',   p:5,  s:'CF-Wing', desc:'Full CF construction. Lightweight downforce. Beautiful arcs.'},
+    {l:'Swan Neck GT Wing (Race Mount)',  v:'Swan',   tier:'S',   p:4,  s:'Swan-Nk', desc:'Clean aerodynamic mount. Underside flow maintained.'},
+    {l:'Formula GT / FIA GT1 Wing',       v:'FIA_W',  tier:'SS',  p:3,  s:'FIA-GT',  desc:'Homologated GT1/GT3 spec wing. FIA approved. Real downforce.'},
+    {l:'Active DRS Wing System',          v:'DRS',    tier:'SSS', p:2,  s:'DRS',     desc:'Drag Reduction System. F1-derived actuation. Button stall.'},
+    {l:'RWB Signature Ducktail',          v:'RWBTail',tier:'SSS', p:1,  s:'RWB-Tail',desc:'Nakai-san approved. Only valid with RWB kit. The vision.'},
+  ],
+  filter:(o,s)=>{
+    const bk=s.bodykit?.v;
+    return o.filter(x=>{
+      if(x.v==='RWBTail'&&bk!=='RWB')return false;
+      if(x.v==='DRS'&&!['GTHom','GTRace','RWB','Custom'].includes(bk))return false;
+      if(['FIA_W','DRS'].includes(x.v)&&bk==='Stock')return false;
+      return true;
+    });
+  },
+},
+
+/* 18 ─ LIGHTING */
+{
+  id:'lights', name:'Lighting Package', emoji:'💡', dependsOn:[],
+  sub:'How you illuminate the road and your presence. Eyes are everything.',
+  opts:[
+    {l:'Stock Halogen (Factory)',         v:'Halog',  tier:'F',   p:28, s:'Halogen', desc:'Candles by comparison. Technically legal. Visibility optional.'},
+    {l:'OEM LED (Factory Fitted)',        v:'OEMLED', tier:'D',   p:18, s:'OEM-LED', desc:'Factory LED. What it came with. Acceptable.'},
+    {l:'HID Xenon D2S/D4S Retrofit',     v:'HID',    tier:'C',   p:14, s:'HID',     desc:'35W arc lamp. White-blue glow. 90s supercar energy.'},
+    {l:'LED Headlight Retrofit Kit',      v:'LEDret', tier:'C',   p:12, s:'LED-Ret', desc:'H7/H4 LED swap. Bright. Legally grey in some regions.'},
+    {l:'Sequential LED Turn Signals',     v:'SeqTrn', tier:'B',   p:8,  s:'Seq-Turn',desc:'Mustang / Audi sequential indicators. Turn with theatre.'},
+    {l:'Angel Eye / Halo DRL Rings',      v:'Halo',   tier:'B',   p:7,  s:'Angel-E', desc:'BMW halo-style DRL rings. Unmistakable at night.'},
+    {l:'Custom Signature DRL Pattern',    v:'CustDRL',tier:'A',   p:5,  s:'Cust-DRL',desc:'Unique LED pattern. Your face in the dark.'},
+    {l:'Full Adaptive Matrix LED',        v:'Matrix', tier:'S',   p:3,  s:'Matrix',  desc:'Audi A8-level light show. 100 individual LEDs per unit.'},
+    {l:'Laser Headlights (Bosch ILS)',    v:'Laser',  tier:'SS',  p:2,  s:'Laser',   desc:'800m range. BMW i8 spec. Coherent focused beam.'},
+    {l:'OLED Rear Lamps + Custom DRL',    v:'OLED',   tier:'SS',  p:2,  s:'OLED',    desc:'OLED flat-panel brake lights. Audi / Mercedes concept spec.'},
+    {l:'Full Bespoke OLED Front + Rear',  v:'FullOLED',tier:'SSS',p:1,  s:'Fl-OLED', desc:'Fully custom OLED lighting signature. Concept car made real.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 19 ─ TINT */
+{
+  id:'tint', name:'Window Tint', emoji:'🕶', dependsOn:[],
+  sub:'Privacy and presence. How dark you go defines your anonymity on the road.',
+  opts:[
+    {l:'No Tint (Factory Clear)',         v:'None',   tier:'F',   p:30, s:'None',    desc:'100% VLT. Fully transparent. Average civilian specification.'},
+    {l:'35% VLT (Light / Legal)',         v:'35vlt',  tier:'D',   p:20, s:'35%',     desc:'Light tint. Barely noticeable. Legal everywhere. Fine.'},
+    {l:'20% VLT (Dark)',                  v:'20vlt',  tier:'C',   p:16, s:'20%',     desc:'Noticeably dark. Purposeful statement. Borderline in some regions.'},
+    {l:'15% VLT (Very Dark)',             v:'15vlt',  tier:'B',   p:10, s:'15%',     desc:'Hard to see from outside. That is exactly the point.'},
+    {l:'5% VLT (Limo Tint)',              v:'5vlt',   tier:'A',   p:8,  s:'5% Limo', desc:'Near-blackout rear. Invisible interior. Total anonymity.'},
+    {l:'Windshield Band Strip Tint',      v:'WShield',tier:'B',   p:6,  s:'W-Strip',  desc:'Gradient visor band. Rally car / JDM import style.'},
+    {l:'Full Blackout All Glass',         v:'Blkout', tier:'S',   p:4,  s:'Blk-Out', desc:'Every window blackened. Maximum mystery. Law enforcement interest.'},
+    {l:'Ceramic IR-Blocking Tint',        v:'Ceramic',tier:'S',   p:4,  s:'Ceramic', desc:'XPEL / SunTek ceramic. Heat rejection + UV. Invisible luxury.'},
+    {l:'3M Crystalline (Premium Clear)',  v:'3MCryst',tier:'SS',  p:2,  s:'3M-Crys', desc:'99% UV block. Near-clear appearance. The stealth premium choice.'},
+  ],
+  filter:(o,_)=>o,
+},
+
+/* 20 ─ CARBON UPGRADES */
+{
+  id:'carbon', name:'Carbon Fibre Upgrades', emoji:'🕸', dependsOn:['bodykit','chassis'],
+  sub:'The material of motorsport. Black weave everywhere — if you can justify it.',
+  opts:[
+    {l:'None / Full OEM Plastic',         v:'None',   tier:'F',   p:30, s:'None',    desc:'Zero carbon. Full OEM plastic everywhere. Budget reality.'},
+    {l:'Carbon Mirror Caps Only',         v:'Caps',   tier:'C',   p:22, s:'CF-Caps', desc:'The gateway carbon drug. Every build starts here.'},
+    {l:'Carbon Spoiler + Small Trim',     v:'Small',  tier:'C',   p:14, s:'CF-Small',desc:'Spoiler, door handles, fuel cap. Baby steps into the weave.'},
+    {l:'Carbon Fibre Hood / Bonnet',      v:'Hood',   tier:'B',   p:10, s:'CF-Hood', desc:'Lightweight hood. 5-15kg saving. Structural and visual statement.'},
+    {l:'Carbon Roof + Hood',              v:'RoofHood',tier:'B',  p:8,  s:'CF-R+H',  desc:'Roof + hood in CF. M3/M4 CSL homage. CG drops measurably.'},
+    {l:'Carbon Diffuser + Front Splitter',v:'Aero',   tier:'A',   p:6,  s:'CF-Aero', desc:'Full aero package in carbon. Diffuser, splitter, canards.'},
+    {l:'Full Carbon Body Panels',         v:'FullPnl',tier:'S',   p:4,  s:'CF-Body', desc:'Doors, bonnet, bootlid, roof all in CF. Race car DNA.'},
+    {l:'Dry Carbon Everything (Pre-Preg)',v:'DryCF',  tier:'SS',  p:3,  s:'DryCarb', desc:'Pre-pregged autoclave CF. Maximum stiffness-to-weight.'},
+    {l:'Exposed Weave Visible CF Body',   v:'ShowCF', tier:'SSS', p:2,  s:'ShowCF',  desc:'Clearcoat over exposed weave. Raw performance as aesthetic.'},
+  ],
+  filter:(o,s)=>{
+    const ch=s.chassis?.v;
+    return o.filter(x=>{
+      if(['DryCF','ShowCF'].includes(x.v)&&!['TiCF','RTM','FullCF','HybCF','CFRP'].includes(ch))return false;
+      return true;
+    });
+  },
+},
+
+/* 21 ─ BRANDING */
+{
+  id:'branding', name:'Badging & Livery Detail', emoji:'🏁', dependsOn:['paint'],
+  sub:'The finishing identity. Badges, numbers, stripes. The story told at a glance.',
+  opts:[
+    {l:'Full OEM Factory Badging',        v:'OEM',    tier:'D',   p:28, s:'OEM',     desc:'Factory badges. Everything as intended. Conventional.'},
+    {l:'De-Badged (All Removed + Filled)',v:'DeBadge',tier:'B',   p:20, s:'De-Bdg',  desc:'All badges removed and filled. Clean. Anonymous. Purist.'},
+    {l:'Racing Number (Door / Roof)',      v:'RaceNum',tier:'B',   p:14, s:'Race-#',  desc:'Your number. White circle on door. The racing tradition.'},
+    {l:'Subtle Centre Stripe (Rally Ref)',v:'Stripe', tier:'A',   p:10, s:'Stripe',  desc:'Centre / bonnet stripe. Adds 50hp aesthetically. Always works.'},
+    {l:'JDM Import Decals / Kanji Text',  v:'JDMdec', tier:'C',   p:8,  s:'JDM-Dec', desc:'Kanji decals. JDM-spec script. Nurburgring sticker optional.'},
+    {l:'Full Racing Livery (Hero Car)',    v:'RaceLiv',tier:'SS',  p:5,  s:'Race-Liv',desc:'Gulf / Martini / Marlboro-inspired full coverage. Hero car spec.'},
+    {l:'Manufacturer Heritage Livery',    v:'Heritage',tier:'SS', p:4,  s:'Heritage',desc:'Rothmans / Subaru WRC / McLaren Orange. Brand history worn.'},
+    {l:'Full Sponsor Livery Package',     v:'Sponsor',tier:'S',   p:5,  s:'Sponsor', desc:'Sponsor decals full coverage. BTCC / Blancpain aesthetic.'},
+    {l:'Pinstripe / Hand-Painted Coachline',v:'Pinline',tier:'A', p:4,  s:'Pinline', desc:'Coachline detail. Rolls-Royce / Morgan tradition. Artisan touch.'},
+    {l:'One-Off Artist Collaboration',    v:'ArtCollab',tier:'SSS',p:2, s:'ArtCollab',desc:'A literal artist painted your car. Unique beyond measurement.'},
+  ],
+  filter:(o,s)=>{
+    const pt=s.paint?.v;
+    return o.filter(x=>{
+      if(['RaceLiv','Heritage','ArtCollab'].includes(x.v)&&pt==='BareCF')return false;
+      return true;
+    });
+  },
+},
+];
+
+/* ══════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════ */
+const PHASE_SPLIT=12;
+let state={}, wIdx=0, spinning=false, wAngle=0, lastWinner=null;
+const canvas=document.getElementById('wheelCanvas');
+const ctx=canvas.getContext('2d');
+const CX=230,CY=230,R=218,HUB=36;
+
+/* ══════════════════════════════════════════════════════════
+   POWER ESTIMATION
+══════════════════════════════════════════════════════════ */
+function estHP(s){
+  if(!s.disp)return 0;
+  let hp=s.disp.v*0.068;
+  const lm={I2:.82,I3:.88,I4:1,I5:1.05,I6:1.1,F4:.97,F6:1.08,V6:1,V8:1.05,V10:1.1,V12:1.12,W12:1.1,W16:1.15};
+  if(s.layout)hp*=(lm[s.layout.v]||1);
+  const am={NA:1,TDI:.72,ST:1.45,TST:1.62,SC:1.5,TT:1.82,TC:2.12,ALT:1.72,QT:2.55};
+  if(s.asp)hp*=(am[s.asp.v]||1);
+  return Math.round(hp);
+}
+function estTQ(s){
+  const hp=estHP(s);
+  if(!hp)return 0;
+  const rm={NA:.85,TDI:1.4,ST:1,TST:1.05,SC:1.1,TT:1.1,TC:1.15,ALT:1,QT:1.2};
+  const r=s.asp?(rm[s.asp.v]||.9):.9;
+  return Math.round(hp*r*.73);
+}
+
+/* ══════════════════════════════════════════════════════════
+   WEIGHTED RANDOM
+══════════════════════════════════════════════════════════ */
+function wRand(opts){
+  const tot=opts.reduce((a,o)=>a+o.p,0);
+  let r=Math.random()*tot;
+  for(const o of opts){r-=o.p;if(r<=0)return o;}
+  return opts[opts.length-1];
+}
+
+/* ══════════════════════════════════════════════════════════
+   CANVAS DRAWING
+══════════════════════════════════════════════════════════ */
+function drawWheel(opts,rot,hlIdx=-1){
+  ctx.clearRect(0,0,460,460);
+  const tot=opts.reduce((a,o)=>a+o.p,0);
+  let cum=rot;
+  for(let i=0;i<opts.length;i++){
+    const o=opts[i];
+    const seg=(o.p/tot)*2*Math.PI;
+    const s=cum, e=cum+seg, mid=(s+e)/2;
+    const hl=i===hlIdx;
+    ctx.beginPath();ctx.moveTo(CX,CY);ctx.arc(CX,CY,R,s,e);ctx.closePath();
+    if(hl){
+      const g=ctx.createRadialGradient(CX,CY,HUB,CX,CY,R);
+      g.addColorStop(0,TIER_FILL[o.tier]||'#1c1c1c');
+      g.addColorStop(.6,TIER[o.tier].c+'33');
+      g.addColorStop(1,TIER[o.tier].c+'88');
+      ctx.fillStyle=g;
+    } else {
+      ctx.fillStyle=TIER_FILL[o.tier]||'#181818';
+    }
+    ctx.fill();
+    ctx.strokeStyle=TIER[o.tier].c;
+    ctx.lineWidth=hl?3:1;
+    ctx.globalAlpha=hl?1:.55;
+    ctx.stroke();
+    ctx.globalAlpha=1;
+    const arcLen=seg*R;
+    if(arcLen>18&&seg>0.06){
+      ctx.save();ctx.translate(CX,CY);ctx.rotate(mid);
+      const td=R*.64;
+      ctx.fillStyle=TIER[o.tier].c;
+      ctx.font=`bold ${seg>0.28?'11':'9'}px Orbitron,sans-serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor=TIER[o.tier].c;ctx.shadowBlur=hl?12:4;
+      ctx.fillText(o.s,td,0);
+      ctx.shadowBlur=0;ctx.restore();
+    } else {
+      const ex=CX+R*.91*Math.cos(mid),ey=CY+R*.91*Math.sin(mid);
+      ctx.beginPath();ctx.arc(ex,ey,3.5,0,2*Math.PI);
+      ctx.fillStyle=TIER[o.tier].c;ctx.fill();
+    }
+    cum=e;
+  }
+  const og=ctx.createLinearGradient(CX-R,CY,CX+R,CY);
+  og.addColorStop(0,'rgba(50,50,50,.9)');og.addColorStop(.35,'rgba(160,160,160,.95)');
+  og.addColorStop(.5,'rgba(220,220,220,1)');og.addColorStop(.65,'rgba(160,160,160,.95)');
+  og.addColorStop(1,'rgba(50,50,50,.9)');
+  ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);
+  ctx.strokeStyle=og;ctx.lineWidth=9;ctx.stroke();
+  const hg=ctx.createRadialGradient(CX-6,CY-6,2,CX,CY,HUB);
+  hg.addColorStop(0,'#555');hg.addColorStop(.5,'#1e1e1e');hg.addColorStop(1,'#0a0a0a');
+  ctx.beginPath();ctx.arc(CX,CY,HUB,0,2*Math.PI);
+  ctx.fillStyle=hg;ctx.fill();ctx.strokeStyle='#444';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#ff2200';ctx.font='bold 17px Arial';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='#ff2200';ctx.shadowBlur=8;
+  ctx.fillText('⚙',CX,CY);ctx.shadowBlur=0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   AUDIO — Enhanced with car sounds and tier-specific fanfares
+══════════════════════════════════════════════════════════ */
+let aC=null;
+function getAC(){if(!aC)aC=new(window.AudioContext||window.webkitAudioContext)();return aC;}
+
+function tick(f=500,v=0.05){
+  try{const ac=getAC(),o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);o.type='square';o.frequency.value=f;
+    g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.04);
+    o.start();o.stop(ac.currentTime+.04);}catch(e){}
+}
+
+/* Engine idle rumble — low frequency noise burst */
+function playEngineIdle(){
+  try{
+    const ac=getAC();
+    const buf=ac.createBuffer(1,ac.sampleRate*0.4,ac.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.15*Math.exp(-i/(d.length*0.6));
+    const s=ac.createBufferSource(),g=ac.createGain();
+    const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=120;
+    s.buffer=buf;s.connect(f);f.connect(g);g.connect(ac.destination);
+    g.gain.setValueAtTime(0.4,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.4);
+    s.start();
+  }catch(e){}
+}
+
+/* Turbo spool — rising whine */
+function playTurboSpool(){
+  try{
+    const ac=getAC(),o=ac.createOscillator(),g=ac.createGain();
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(200,ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1200,ac.currentTime+0.6);
+    g.gain.setValueAtTime(0.06,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.6);
+    o.connect(g);g.connect(ac.destination);
+    o.start();o.stop(ac.currentTime+0.6);
+  }catch(e){}
+}
+
+/* Gear shift click */
+function playGearShift(){
+  try{
+    const ac=getAC();
+    [0,0.06].forEach(dt=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='square';o.frequency.value=dt===0?320:180;
+      const t=ac.currentTime+dt;
+      g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.05);
+      o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.05);
+    });
+  }catch(e){}
+}
+
+/* V8 exhaust pop sequence */
+function playExhaustPop(){
+  try{
+    const ac=getAC();
+    [0,0.08,0.14,0.22].forEach((dt,i)=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sawtooth';o.frequency.value=80+i*20;
+      const t=ac.currentTime+dt;
+      const v=0.18-i*0.03;
+      g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+      o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.07);
+    });
+  }catch(e){}
+}
+
+/* Rev limiter bounce */
+function playRevLimit(){
+  try{
+    const ac=getAC();
+    for(let i=0;i<6;i++){
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sawtooth';o.frequency.value=1800+i*80;
+      const t=ac.currentTime+i*0.04;
+      g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.035);
+      o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.04);
+    }
+  }catch(e){}
+}
+
+/* Tier-specific win fanfares — excitement scales with tier */
+function winSound(tier){
+  try{
+    const ac=getAC();
+    const configs={
+      F:{freqs:[220],type:'square',vol:0.08,dur:0.3,delay:0.2,reverb:false},
+      D:{freqs:[262,330],type:'square',vol:0.1,dur:0.35,delay:0.15,reverb:false},
+      C:{freqs:[330,392,494],type:'triangle',vol:0.12,dur:0.4,delay:0.13,reverb:false},
+      B:{freqs:[392,494,587,740],type:'triangle',vol:0.14,dur:0.5,delay:0.12,reverb:false},
+      A:{freqs:[494,587,740,880,987],type:'sine',vol:0.16,dur:0.6,delay:0.11,reverb:false},
+      S:{freqs:[587,740,880,1047,1175,1319],type:'sine',vol:0.18,dur:0.7,delay:0.10,reverb:true},
+      SS:{freqs:[659,784,880,1047,1175,1319,1568,1760],type:'sine',vol:0.20,dur:0.8,delay:0.09,reverb:true},
+      SSS:{freqs:[659,784,988,1175,1319,1568,1760,2093,2349],type:'sine',vol:0.22,dur:1.0,delay:0.08,reverb:true},
+    };
+    const cfg=configs[tier]||configs.C;
+    // Play exhaust pops for high tiers before fanfare
+    if(['SS','SSS'].includes(tier))setTimeout(()=>playExhaustPop(),0);
+    if(tier==='SSS')setTimeout(()=>playRevLimit(),200);
+    cfg.freqs.forEach((f,i)=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type=cfg.type;o.frequency.value=f;
+      const t=ac.currentTime+i*cfg.delay;
+      g.gain.setValueAtTime(cfg.vol,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+cfg.dur);
+      o.connect(g);g.connect(ac.destination);
+      o.start(t);o.stop(t+cfg.dur+0.05);
+    });
+    // Add reverb shimmer for SSS
+    if(cfg.reverb&&tier==='SSS'){
+      setTimeout(()=>{
+        [1047,1319,1760].forEach((f,i)=>{
+          const o=ac.createOscillator(),g=ac.createGain();
+          o.type='sine';o.frequency.value=f;
+          const t=ac.currentTime+i*0.15;
+          g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.9);
+          o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+1.0);
+        });
+      },400);
+    }
+  }catch(e){}
+}
+
+/* ══════════════════════════════════════════════════════════
+   SPIN ANIMATION
+══════════════════════════════════════════════════════════ */
+function applyEngagementCurve(opts){
+  if(!opts||!opts.length)return opts;
+  const curved=opts.map(o=>({...o,_cp:Math.pow(Math.max(1,o.p),0.38)}));
+  const cTot=curved.reduce((a,o)=>a+o._cp,0);
+  const FLOORS={SSS:5.0,SS:4.0,S:3.0};
+  const floored=curved.map(o=>({
+    ...o,
+    _fp:Math.max(FLOORS[o.tier]||0,(o._cp/cTot)*100)
+  }));
+  const fTot=floored.reduce((a,o)=>a+o._fp,0);
+  return floored.map(o=>({...o,p:Math.max(1,Math.round((o._fp/fTot)*10000))}));
+}
+
+function easeOut(t){return 1-Math.pow(1-t,4.5);}
+
+let _autoSpinCb=null;
+function startSpin(onComplete){
+  if(spinning)return;
+  _autoSpinCb=(typeof onComplete==='function')?onComplete:null;
+  try{getAC().resume();}catch(e){}
+  // Play engine rev at spin start
+  playEngineIdle();
+  const isStyle=wIdx>=PHASE_SPLIT;
+  if(isStyle)setTimeout(()=>playTurboSpool(),150);
+  const wheel=WHEELS[wIdx];
+  const opts=applyEngagementCurve(wheel.filter(wheel.opts.map(o=>({...o})),state));
+  const winner=wRand(opts);
+  const wI=opts.findIndex(o=>o.v===winner.v);
+  const tot=opts.reduce((a,o)=>a+o.p,0);
+  let cum=0;
+  for(let i=0;i<wI;i++)cum+=(opts[i].p/tot)*2*Math.PI;
+  const seg=(opts[wI].p/tot)*2*Math.PI;
+  const midLocal=cum+seg/2;
+  const pointer=3*Math.PI/2;
+  let tBase=pointer-midLocal;
+  tBase=((tBase%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  const currNorm=((wAngle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  let add=tBase-currNorm;
+  if(add<=0)add+=2*Math.PI;
+  add+=(5+Math.floor(Math.random()*4))*2*Math.PI;
+  const startA=wAngle,endA=wAngle+add;
+  const dur=4000+Math.random()*1500;
+  spinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('continueBtn').style.display='none';
+  document.getElementById('resultBox').innerHTML=`<div class="res-lbl">SPINNING...</div><div style="color:var(--orange);font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700">▶ ▶ ▶</div>`;
+  let st=null,lastTick=startA;
+  const TICK_INT=2*Math.PI/Math.max(opts.length,6);
+  function frame(ts){
+    if(!st)st=ts;
+    const t=Math.min((ts-st)/dur,1), e=easeOut(t);
+    wAngle=startA+(endA-startA)*e;
+    if(Math.abs(wAngle-lastTick)>TICK_INT*.4){
+      const spd=1-e;tick(350+spd*450,.03+spd*.07);lastTick=wAngle;
+    }
+    drawWheel(opts,wAngle,t===1?wI:-1);
+    if(t<1){requestAnimationFrame(frame);}
+    else{
+      wAngle=endA;drawWheel(opts,wAngle,wI);spinning=false;
+      winSound(winner.tier);lastWinner=winner;
+      showResult(winner,opts);
+      if(_autoSpinCb){const cb=_autoSpinCb;_autoSpinCb=null;setTimeout(cb,600);}
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ══════════════════════════════════════════════════════════
+   AUTO SPIN — TOGGLE MODE
+   Click once → ON (glows, spins automatically)
+   Click again → OFF (stops cleanly after current wheel)
+══════════════════════════════════════════════════════════ */
+let _autoRunning=false;
+let _autoStepTimer=null; // stored so we can clearTimeout on toggle-off
+
+function toggleAutoSpin(){
+  if(_autoRunning){
+    // ---- TURN OFF ----
+    _autoRunning=false;
+    // Cancel any queued next-spin timer immediately — prevents the 400ms race window
+    if(_autoStepTimer){clearTimeout(_autoStepTimer);_autoStepTimer=null;}
+    _updateAutoBtn();
+    // Only re-enable spinBtn if no result is showing yet.
+    // If a result IS showing, let them click Next Wheel — loadWheel() re-enables on the new wheel.
+    if(!spinning && !lastWinner)document.getElementById('spinBtn').disabled=false;
+  } else {
+    // ---- TURN ON ----
+    // Don't start if a spin is in progress OR if a result is already on screen
+    if(spinning || lastWinner)return;
+    _autoRunning=true;
+    _updateAutoBtn();
+    document.getElementById('spinBtn').disabled=true;
+    _autoStep();
+  }
+}
+
+function _updateAutoBtn(){
+  const btn=document.getElementById('autoSpinBtn');
+  if(!btn)return;
+  const isStyle=wIdx>=PHASE_SPLIT;
+  const phase=isStyle?' style-phase':'';
+  btn.className='auto-spin-btn'+(_autoRunning?' on':'')+phase;
+  btn.innerHTML=_autoRunning
+    ?(isStyle?'✨ AUTO: ON':'⚡ AUTO: ON')
+    :(isStyle?'✨ AUTO SPIN':'⚡ AUTO SPIN');
+}
+
+function _autoStep(){
+  if(!_autoRunning){_finalizeAutoStop();return;}
+  if(wIdx>=WHEELS.length){_finalizeAutoStop();return;}
+  const currentPhase=wIdx<PHASE_SPLIT?0:1;
+  startSpin(function(){
+    if(!_autoRunning){_finalizeAutoStop();return;}
+    _autoCountdown(3,function(){
+      if(!_autoRunning){_finalizeAutoStop();return;}
+      advance();
+      if(wIdx===PHASE_SPLIT||wIdx>=WHEELS.length){
+        _finalizeAutoStop();return;
+      }
+      const newPhase=wIdx<PHASE_SPLIT?0:1;
+      if(newPhase!==currentPhase){_finalizeAutoStop();return;}
+      _autoStepTimer=setTimeout(_autoStep,400);
+    });
+  });
+}
+
+function _autoCountdown(n,cb){
+  // If user toggled off mid-countdown, stop immediately
+  if(!_autoRunning){
+    document.getElementById('autoCountdown').style.display='none';
+    _finalizeAutoStop();return;
+  }
+  const isStyle=wIdx>=PHASE_SPLIT;
+  const overlay=document.getElementById('autoCountdown');
+  const bubble=document.getElementById('acdBubble');
+  const numEl=document.getElementById('acdNum');
+  bubble.className='acd-bubble'+(isStyle?' style-phase':'');
+  numEl.style.color=isStyle?'#aa44ff':'var(--orange)';
+  if(n===0){overlay.style.display='none';cb();return;}
+  overlay.style.display='flex';
+  numEl.textContent=n;
+  setTimeout(()=>_autoCountdown(n-1,cb),900);
+}
+
+function _finalizeAutoStop(){
+  _autoRunning=false;
+  // Cancel any pending next-spin timer
+  if(_autoStepTimer){clearTimeout(_autoStepTimer);_autoStepTimer=null;}
+  document.getElementById('autoCountdown').style.display='none';
+  // Re-enable spinBtn only if there is no pending result to review.
+  // If a result is on screen, loadWheel() will re-enable spinBtn when user advances.
+  if(!lastWinner)document.getElementById('spinBtn').disabled=false;
+  _updateAutoBtn();
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESULT DISPLAY
+══════════════════════════════════════════════════════════ */
+function showResult(w,opts){
+  const c=TIER[w.tier].c;
+  document.getElementById('resultBox').innerHTML=`
+    <div class="res-lbl pop-in">YOU OBTAINED:</div>
+    <div class="res-val pop-in" style="color:${c}">${w.l}</div>
+    <div class="res-desc">${w.desc}</div>
+    <div class="res-tier pop-in" style="background:${c}18;color:${c};border:1px solid ${c}44">TIER ${w.tier}</div>
+  `;
+  document.getElementById('continueBtn').style.display='block';
+}
+
+/* ══════════════════════════════════════════════════════════
+   ADVANCE
+══════════════════════════════════════════════════════════ */
+function advance(){
+  if(!lastWinner)return;
+  // Gear shift sound on Next Wheel
+  try{getAC().resume();}catch(e){}
+  playGearShift();
+  const wheel=WHEELS[wIdx];
+  state[wheel.id]={...lastWinner};
+  wIdx++;
+  lastWinner=null;
+  if(wIdx>=WHEELS.length){showFinal();return;}
+  if(wIdx===PHASE_SPLIT){showPhaseTransition();return;}
+  loadWheel(wIdx);
+  updateDots();
+  updateGarage();
+  updateMiniStats();
+}
+
+function showPhaseTransition(){
+  const hp=estHP(state);
+  document.getElementById('ptDetails').innerHTML=
+    `<b style="color:var(--orange)">~${hp} BHP</b>`;
+  document.getElementById('phaseTransition').style.display='flex';
+}
+
+function beginAesthetics(){
+  // Turbo spool when entering aesthetics phase
+  try{getAC().resume();}catch(e){}
+  playTurboSpool();
+  document.getElementById('phaseTransition').style.display='none';
+  loadWheel(wIdx);
+  updateDots();
+  updateGarage();
+  updateMiniStats(); // switch mini-stats panel to style-score mode
+}
+
+/* ══════════════════════════════════════════════════════════
+   LOAD WHEEL
+══════════════════════════════════════════════════════════ */
+function loadWheel(i){
+  const w=WHEELS[i];
+  const isStyle=i>=PHASE_SPLIT;
+  const opts=applyEngagementCurve(w.filter(w.opts.map(o=>({...o})),state));
+  wAngle=Math.random()*2*Math.PI;
+  document.getElementById('catName').textContent=w.name.toUpperCase();
+  document.getElementById('catSub').textContent=w.sub;
+  document.getElementById('wheelNum').textContent=i+1;
+  // Phase badge — no emoji
+  document.getElementById('phaseBadge').textContent=isStyle?'✨ AESTHETICS':'⚡ PERFORMANCE';
+  document.getElementById('phaseBadge').style.color=isStyle?'#aa44ff':'var(--orange)';
+  syncAutoSpinBtnStyle();
+  // Spin button colour
+  const sb=document.getElementById('spinBtn');
+  sb.style.background=isStyle?'linear-gradient(135deg,#aa44ff,#660099)':'linear-gradient(135deg,var(--red),#990000)';
+  sb.style.boxShadow=isStyle?'0 0 20px rgba(170,68,255,0.3),0 4px 20px rgba(0,0,0,0.5)':'';
+  // Continue button colour + class for hover
+  const cb=document.getElementById('continueBtn');
+  cb.style.borderColor=isStyle?'#aa44ff':'var(--orange)';
+  cb.style.color=isStyle?'#aa44ff':'var(--orange)';
+  if(isStyle){cb.classList.add('style-phase');}else{cb.classList.remove('style-phase');}
+  // Cat banner colour for aesthetics
+  const catBanner=document.querySelector('.cat-banner');
+  if(isStyle){
+    catBanner.style.background='linear-gradient(90deg,rgba(170,68,255,0.07),transparent 60%,rgba(170,68,255,0.04))';
+    catBanner.style.borderBottomColor='rgba(170,68,255,0.12)';
+  } else {
+    catBanner.style.background='linear-gradient(90deg,rgba(255,34,0,0.07),transparent 60%,rgba(255,119,0,0.04))';
+    catBanner.style.borderBottomColor='rgba(255,34,0,0.12)';
+  }
+  // Dep tags
+  const dt=document.getElementById('depTags');dt.innerHTML='';
+  w.dependsOn.forEach(dep=>{
+    if(state[dep]){
+      const b=document.createElement('div');
+      b.className=isStyle?'dep-tag style-dep-tag':'dep-tag';
+      const dw=WHEELS.find(x=>x.id===dep);
+      b.textContent=`${dw?dw.name:dep}: ${state[dep].l}`;
+      dt.appendChild(b);
+    }
+  });
+  drawWheel(opts.length?opts:w.opts,wAngle);
+  updateOptPanel(opts.length?opts:w.opts);
+  document.getElementById('spinBtn').disabled=!!_autoRunning;
+  document.getElementById('continueBtn').style.display='none';
+  document.getElementById('resultBox').innerHTML=`
+    <div class="res-lbl">AWAITING RESULT</div>
+    <div style="color:var(--txt3);font-family:'Share Tech Mono',monospace;font-size:12px">${(opts.length?opts:w.opts).length} options available</div>
+  `;
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI HELPERS
+══════════════════════════════════════════════════════════ */
+function updateOptPanel(opts){
+  const tot=opts.reduce((a,o)=>a+o.p,0);
+  const sorted=[...opts].sort((a,b)=>b.p-a.p);
+  document.getElementById('optsList').innerHTML=sorted.map(o=>{
+    const pct=((o.p/tot)*100).toFixed(1),c=TIER[o.tier].c;
+    return `<div class="opt-item">
+      <div class="opt-bar" style="width:${pct}%;background:${c}"></div>
+      <div class="opt-dot" style="background:${c};box-shadow:0 0 5px ${c}66"></div>
+      <div><div class="opt-name" style="color:${c}">${o.l}</div><div class="opt-prob">${pct}% | T-${o.tier}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function updateGarage(){
+  const isAesthetics=wIdx>=PHASE_SPLIT;
+  const mkPart=(w,i,isStyle)=>{
+    const p=state[w.id];
+    const ac=isStyle?'rgba(170,68,255,.4)':'rgba(255,119,0,.4)';
+    const ag=isStyle?'rgba(170,68,255,.05)':'rgba(255,119,0,.05)';
+    const cc=isStyle?'#aa44ff':'var(--orange)';
+    if(p){const c=TIER[p.tier].c;return`<div class="part-item"><div class="part-lbl">${w.name.toUpperCase()}</div><div class="part-val" style="color:${c}">${p.l}</div><div class="part-tier-badge" style="background:${c}18;color:${c};border:1px solid ${c}33">T-${p.tier}</div></div>`;}
+    if(i===wIdx)return`<div class="part-item" style="border-color:${ac};background:${ag}"><div class="part-lbl">${w.name.toUpperCase()}</div><div class="part-val" style="color:${cc}">▶ CURRENT</div></div>`;
+    return`<div class="part-item pending"><div class="part-lbl" style="opacity:.4">${w.name.toUpperCase()}</div><div class="part-val" style="color:var(--txt3);font-size:12px">LOCKED</div></div>`;
+  };
+  if(isAesthetics){
+    const styleHtml=WHEELS.slice(PHASE_SPLIT).map((w,i)=>mkPart(w,i+PHASE_SPLIT,true)).join('');
+    document.getElementById('partsList').innerHTML=
+      `<div class="panel-hdr" style="color:#aa44ff;margin-top:0;padding-top:0">✨ AESTHETICS</div>${styleHtml}`;
+  } else {
+    const perfHtml=WHEELS.slice(0,PHASE_SPLIT).map((w,i)=>mkPart(w,i,false)).join('');
+    document.getElementById('partsList').innerHTML=
+      `<div class="panel-hdr" style="color:var(--orange);margin-top:0;padding-top:0">⚡ PERFORMANCE</div>${perfHtml}`;
+  }
+}
+
+function updateMiniStats(){
+  const hp=estHP(state),tq=estTQ(state);
+  if(!state.disp){
+    // Show 0 values before disp is selected
+    document.getElementById('miniStats').style.display='block';
+    document.getElementById('msHP').textContent='0 BHP';
+    document.getElementById('msTier').textContent='—';
+    document.getElementById('msTQ').textContent='0 lb-ft';
+    document.getElementById('headerHP').textContent='0 BHP';
+    return;
+  }
+  document.getElementById('miniStats').style.display='block';
+  document.getElementById('msHP').textContent=`${hp} BHP`;
+  document.getElementById('headerHP').textContent=`${hp} BHP`;
+  if(wIdx>=PHASE_SPLIT){
+    const ss=styleScore();
+    document.getElementById('msTierLbl').textContent='STYLE SO FAR';
+    document.getElementById('msTier').textContent=ss.label;
+    document.getElementById('msTier').style.color='#aa44ff';
+    document.getElementById('msBottomLbl').textContent='STYLE TIER';
+    document.getElementById('msTQ').textContent=ss.styleTier;
+    document.getElementById('msTQ').style.color='#aa44ff';
+  } else {
+    const tiers=[['F',0],['D',100],['C',150],['B',200],['A',300],['S',450],['SS',600],['SSS',800]];
+    let tier='F';for(const[t,min]of tiers)if(hp>min)tier=t;
+    document.getElementById('msTierLbl').textContent='POWER TIER';
+    document.getElementById('msTier').textContent=tier;
+    document.getElementById('msTier').style.color=TIER[tier].c;
+    document.getElementById('msBottomLbl').textContent='TORQUE';
+    document.getElementById('msTQ').textContent=`${tq} lb-ft`;
+    document.getElementById('msTQ').style.color='var(--orange)';
+  }
+}
+
+function updateDots(){
+  const perfW=WHEELS.slice(0,PHASE_SPLIT), styleW=WHEELS.slice(PHASE_SPLIT);
+  const isAesthetics=wIdx>=PHASE_SPLIT;
+  const mkDot=(w,ai,col)=>{
+    const isDone=ai<wIdx;
+    const isActive=ai===wIdx;
+    const canClick=isDone;
+    const cls=isDone?'done':isActive?'active':'';
+    const clickable=canClick;
+    const sty=isActive?`border-color:${col};color:${col}`:'';    const clickHandler=clickable?`onclick="reviewDot(${ai})" title="Click to review"`:'';
+    const cursorStyle=clickable?'cursor:pointer;':'';
+    return `<div class="prog-dot"><div class="dot-circle ${cls}${clickable?' clickable':''}" style="${sty};${cursorStyle}" ${clickHandler}>${isDone?'✓':isAesthetics?(ai-PHASE_SPLIT+1):ai+1}</div><div class="dot-lbl">${DOT_LABELS[w.id]||w.name.split(' ')[0]}</div></div>`;
+  };
+  if(isAesthetics){
+    const dots=styleW.map((w,i)=>mkDot(w,i+PHASE_SPLIT,'#aa44ff')).join('');
+    document.getElementById('progDots').innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">${dots}</div>`;
+  } else {
+    const dots=perfW.map((w,i)=>mkDot(w,i,'#ff7700')).join('');
+    document.getElementById('progDots').innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">${dots}</div>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   DOT REVIEW MODAL
+══════════════════════════════════════════════════════════ */
+function reviewDot(idx){
+  const w=WHEELS[idx];
+  const result=state[w.id];
+  if(!result)return; // not completed, don't open
+  // Check cross-phase lock
+  if(idx>=PHASE_SPLIT&&wIdx<PHASE_SPLIT)return;
+  const c=TIER[result.tier].c;
+  document.getElementById('reviewCat').textContent=w.name.toUpperCase();
+  document.getElementById('reviewVal').textContent=result.l;
+  document.getElementById('reviewVal').style.color=c;
+  document.getElementById('reviewDesc').textContent=result.desc;
+  document.getElementById('reviewTierBadge').textContent=`TIER ${result.tier}`;
+  document.getElementById('reviewTierBadge').style.cssText=`background:${c}18;color:${c};border:1px solid ${c}44`;
+  document.getElementById('reviewLocked').textContent='// READ ONLY — SPIN RESULT LOCKED //';
+  document.getElementById('reviewModal').classList.add('open');
+}
+function closeReview(){
+  document.getElementById('reviewModal').classList.remove('open');
+}
+document.getElementById('reviewModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('reviewModal'))closeReview();
+});
+
+/* ══════════════════════════════════════════════════════════
+   FINAL SCREEN CALCULATIONS
+══════════════════════════════════════════════════════════ */
+function nickname(){
+  const hp=estHP(state),ly=state.layout?.v,a=state.asp?.v,dt=state.drive?.v,ch=state.chassis?.v,d=state.disp?.v;
+  if(hp>950)return'THE APEX PREDATOR';
+  if(hp>700&&ch&&ch.startsWith('Full'))return'CARBON DEITY';
+  if(hp>650&&dt==='RWD')return'THE TYRE MURDERER';
+  if(hp>550&&dt==='AWDTV')return'TORQUE VECTOR GOD';
+  if(a==='QT')return'THE QUAD SNAIL KING';
+  if(a==='TC')return'TWINCHARGED DEMON';
+  if(ly==='W16')return'BUGATTI DROPOUT';
+  if(ly==='V12')return'THE ORCHESTRAL ENGINE';
+  if(ly==='F6'&&a==='NA')return'PORSCHE WHISPER';
+  if(ly==='I6'&&a==='NA')return'THE SILK RUNNER';
+  if(d&&d<=660)return'THE KEI KING';
+  if(d&&d<=1000)return'THE UNDERDOG';
+  if(hp>400&&dt==='FWD')return'TORQUE STEER SPECIAL';
+  if(dt==='MR')return'THE WEIGHT BALANCER';
+  if(dt==='DriftAWD')return'CONTROLLED CHAOS';
+  if(hp>300&&ly==='I4')return'THE FOUR-POT OVERACHIEVER';
+  if(hp<100)return'THE HUMBLE GROCERY GETTER';
+  if(hp<160)return'SPIRITED COMMUTER';
+  return'THE GREY AREA MACHINE';
+}
+
+function styleScore(){
+  const ids=['bodykit','rims','stance','paint','interior','wing','lights','tint','carbon','branding'];
+  let sc=0,n=0;
+  ids.forEach(id=>{const p=state[id];if(p&&p.tier){sc+=TIER[p.tier].score;n++;}});
+  if(!n)return{label:'—',val:0,styleTier:'—'};
+  const avg=sc/n;
+  const val=Math.min(10,Math.max(0,(avg/7)*10)).toFixed(1);
+  const stTiers=[[6,'SSS'],[5,'SS'],[4,'S'],[3,'A'],[2,'B'],[1,'C'],[0,'D']];
+  let styleTier='F';for(const[min,t]of stTiers)if(avg>=min){styleTier=t;break;}
+  return{label:`${val}/10`,val:+val,styleTier};
+}
+
+function buildVibe(){
+  const bk=state.bodykit?.v,wh=state.rims?.v,st=state.stance?.v;
+  const pt=state.paint?.v,int_=state.interior?.v,wg=state.wing?.v;
+  const br=state.branding?.v,ca=state.carbon?.v,lt=state.lights?.v;
+  if(bk==='RWB')return'THE RWB MONK';
+  if(bk==='LBW')return'LIBERTY WALK DISCIPLE';
+  if(int_==='Strip'&&['FIA_W','Swan','DRS'].includes(wg))return'TRACK WEAPON INCARNATE';
+  if(['GTHom','GTRace'].includes(bk)&&wg==='DRS')return'HOMOLOGATION SPECIAL';
+  if(pt==='BareCF'&&br==='DeBadge')return'THE PURIST';
+  if(['Livery','RaceLiv'].includes(pt)||['Heritage','RaceLiv'].includes(br))return'ROLLING MUSEUM PIECE';
+  if(bk==='Stock'&&int_==='Strip')return"WOLF IN SHEEP'S CLOTHING";
+  if(wh==='TE37'&&st==='CoilTk')return'JDM PERFECTION';
+  if(bk==='Stock'&&wh==='Steels')return'THE INVISIBLE MACHINE';
+  if(int_==='CarbInt'&&pt==='Pearl')return"CONCOURS D'ELEGANCE";
+  if(st==='Slam'&&['Work','CCW','UL_CF'].includes(wh))return'CAR SHOW ROYALTY';
+  if(br==='JDMdec'&&bk==='JDMbmp')return'FULL SEND JDM';
+  if(['DryCF','ShowCF'].includes(ca))return'CARBON CULT MEMBER';
+  if(['DRS','FIA_W'].includes(wg))return'AERO AFICIONADO';
+  if(bk==='RB')return'ROCKET BUNNY INITIATE';
+  if(st==='Flush')return'STANCE NATION MEMBER';
+  if(['CCW','CL_Race'].includes(wh))return'SHOW CAR BUILD';
+  if(br==='ArtCollab')return'ROLLING GALLERY PIECE';
+  if(lt==='FullOLED'||lt==='Laser')return'TECH OVERLORD';
+  return'INDIVIDUAL EXPRESSION';
+}
+
+function buildRating(){
+  let sc=0,n=0;
+  Object.values(state).forEach(p=>{if(p&&p.tier){sc+=TIER[p.tier].score;n++;}});
+  if(!n)return{l:'N/A',s:0};
+  const avg=sc/n;
+  const map=[[6.5,'SSS'],[5.5,'SS'],[4.5,'S'],[3.5,'A+'],[3,'A'],[2.5,'B+'],[2,'B'],[1.5,'C+'],[1,'C'],[0,'D']];
+  for(const[min,l]of map)if(avg>=min)return{l,s:avg};
+  return{l:'D',s:0};
+}
+
+function buildClass(){
+  const hp=estHP(state),ch=state.chassis?.v,dt=state.drive?.v;
+  if(hp>850)return'HYPERCAR TERRITORY';
+  if(hp>650&&ch&&(ch.includes('CF')||ch.includes('Ti')))return'EXTREME PERFORMANCE';
+  if(hp>500)return'SUPERCAR ADJACENT';
+  if(hp>400&&dt==='RWD')return'SPORTS CAR PROPER';
+  if(hp>300)return'HOT HATCH OVERLORD';
+  if(hp>200)return'SPIRITED SPORT';
+  if(hp>150)return'PERFORMANCE SEDAN';
+  if(hp>100)return'DAILY DRIVER PLUS';
+  return'ECONOMY SPECIAL';
+}
+
+function est060(){
+  const hp=estHP(state),dt=state.drive?.v,tx=state.tx?.v;
+  const wts={Steel:1500,HSS:1380,SpGF:850,AluMon:1250,CFRP:1200,HybCF:1100,FullCF:960,TiCF:860,RTM:800};
+  const w=wts[state.chassis?.v]||1400;
+  let t=11/(hp/w*1.4);
+  if(['AWDTV','AWDS','AWDH','DriftAWD'].includes(dt))t*=.88;
+  else if(['RWD','MR'].includes(dt))t*=.95;
+  else if(dt==='FWD')t*=1.06;
+  if(['7DCT','8ZF','7MCT','Xtrac'].includes(tx))t*=.92;
+  else if(tx==='CVT')t*=1.08;
+  else if(['3AT','4AT'].includes(tx))t*=1.12;
+  return Math.max(1.8,Math.min(t,18)).toFixed(1);
+}
+
+function showFinal(){
+  const hp=estHP(state),tq=estTQ(state);
+  const rat=buildRating(),bc=buildClass(),t060=est060();
+  const es=Math.min(10,(rat.s*10/14+1.5)).toFixed(1);
+  const ss=styleScore(),vibe=buildVibe();
+  document.getElementById('carNick').textContent=nickname();
+  document.getElementById('buildVibe').textContent=vibe;
+  document.getElementById('ratingLetter').textContent=rat.l;
+  document.getElementById('buildClass').textContent=bc;
+  document.getElementById('enthScore').textContent=`${es}/10`;
+  document.getElementById('styleScoreEl').textContent=ss.label;
+  document.getElementById('est060').textContent=`~${t060}s`;
+  const perfSpecs=[
+    {l:'EST. PEAK POWER',v:`${hp} BHP`,s:'At crankshaft (estimated)',tier:state.asp?.tier},
+    {l:'EST. PEAK TORQUE',v:`${tq} lb-ft`,s:'Estimated at crank',tier:state.asp?.tier},
+    {l:'0–60 MPH',v:`~${t060}s`,s:'Estimated, conditions vary'},
+    {l:'DISPLACEMENT',v:state.disp?(state.disp.v>=1000?`${(state.disp.v/1000).toFixed(1)}L`:`${state.disp.v}cc`):'—',s:'Engine capacity',tier:state.disp?.tier},
+    {l:'CONFIGURATION',v:state.layout?.l||'—',s:'Cylinder layout',tier:state.layout?.tier},
+    {l:'ASPIRATION',v:state.asp?.l||'—',s:'Induction system',tier:state.asp?.tier},
+    {l:'FUEL DELIVERY',v:state.fuel?.l||'—',s:'Injection type',tier:state.fuel?.tier},
+    {l:'VALVETRAIN',v:state.vtrain?.l||'—',s:'Valve actuation',tier:state.vtrain?.tier},
+    {l:'GEARBOX',v:state.tx?.l||'—',s:'Transmission type',tier:state.tx?.tier},
+    {l:'DRIVETRAIN',v:state.drive?.l||'—',s:'Driven wheels',tier:state.drive?.tier},
+    {l:'DIFFERENTIAL',v:state.diff?.l||'—',s:'Torque split system',tier:state.diff?.tier},
+    {l:'SUSPENSION',v:state.susp?.l||'—',s:'Corner architecture',tier:state.susp?.tier},
+    {l:'BRAKES',v:state.brakes?.l||'—',s:'Stopping hardware',tier:state.brakes?.tier},
+    {l:'EXHAUST',v:state.exhaust?.l||'—',s:'Gas exit strategy',tier:state.exhaust?.tier},
+    {l:'CHASSIS',v:state.chassis?.l||'—',s:'Body construction',tier:state.chassis?.tier},
+  ];
+  const styleSpecs=[
+    {l:'BODY KIT / AERO',v:state.bodykit?.l||'—',s:'Visual aero package',tier:state.bodykit?.tier},
+    {l:'WHEELS / RIMS',v:state.rims?.l||'—',s:'Rolling choice',tier:state.rims?.tier},
+    {l:'STANCE',v:state.stance?.l||'—',s:'Ride height & camber',tier:state.stance?.tier},
+    {l:'PAINT / WRAP',v:state.paint?.l||'—',s:'Surface treatment',tier:state.paint?.tier},
+    {l:'INTERIOR',v:state.interior?.l||'—',s:'Cabin specification',tier:state.interior?.tier},
+    {l:'WING / SPOILER',v:state.wing?.l||'—',s:'Rear aero device',tier:state.wing?.tier},
+    {l:'LIGHTING',v:state.lights?.l||'—',s:'Illumination package',tier:state.lights?.tier},
+    {l:'WINDOW TINT',v:state.tint?.l||'—',s:'Glass privacy level',tier:state.tint?.tier},
+    {l:'CARBON UPGRADES',v:state.carbon?.l||'—',s:'CF component level',tier:state.carbon?.tier},
+    {l:'BADGING / LIVERY',v:state.branding?.l||'—',s:'Identity details',tier:state.branding?.tier},
+  ];
+  const mkCard=(sc)=>{
+    const col=sc.tier?TIER[sc.tier].c:'var(--orange)';
+    return `<div class="spec-card" style="border-color:${sc.tier?TIER[sc.tier].c+'33':'var(--border)'}"><div class="sc-lbl">${sc.l}</div><div class="sc-val" style="color:${col}">${sc.v}</div><div class="sc-sub">${sc.s}</div></div>`;
+  };
+  const mkHdr=(label,col,bdr)=>`<div class="spec-section-hdr" style="color:${col};border-color:${bdr}">${label}</div>`;
+  document.getElementById('specGrid').innerHTML=
+    mkHdr('PERFORMANCE SPECS','var(--orange)','rgba(255,119,0,.2)')+
+    perfSpecs.map(sc=>mkCard(sc)).join('')+
+    mkHdr('AESTHETICS SPECS','#aa44ff','rgba(170,68,255,.2)')+
+    styleSpecs.map(sc=>mkCard(sc)).join('');
+  document.getElementById('finalScreen').classList.add('visible');
+  // Play excited sound for final reveal
+  try{getAC().resume();}catch(e){}
+  setTimeout(()=>playRevLimit(),300);
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESTART
+══════════════════════════════════════════════════════════ */
+function restartGame(){
+  // Reset all game state
+  state={};wIdx=0;spinning=false;wAngle=0;lastWinner=null;
+  // Cancel any running auto-spin sequence
+  _autoRunning=false;
+  if(_autoStepTimer){clearTimeout(_autoStepTimer);_autoStepTimer=null;}
+  _autoSpinCb=null;
+  // Reset auto-spin button to default OFF appearance
+  const asb=document.getElementById('autoSpinBtn');
+  if(asb){asb.className='auto-spin-btn';asb.innerHTML='⚡ AUTO SPIN';asb.disabled=false;}
+  // Hide the countdown overlay
+  const acd=document.getElementById('autoCountdown');if(acd)acd.style.display='none';
+  // Re-enable spin button for fresh game
+  const sb=document.getElementById('spinBtn');if(sb)sb.disabled=false;
+  // Hide all overlays and show intro
+  document.getElementById('finalScreen').classList.remove('visible');
+  document.getElementById('phaseTransition').style.display='none';
+  document.getElementById('carLab').classList.remove('visible');
+  document.getElementById('appBody').style.display='none';
+  document.getElementById('introScreen').style.display='flex';
+}
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+document.getElementById('startBtn').onclick=()=>{
+  try{getAC().resume();}catch(e){}
+  playEngineIdle();
+  document.getElementById('introScreen').style.display='none';
+  document.getElementById('appBody').style.display='block';
+  initApp();
+};
+
+function initApp(){
+  updateDots();updateGarage();loadWheel(0);
+  document.getElementById('headerHP').textContent='0 BHP';
+  document.getElementById('miniStats').style.display='block';
+  document.getElementById('msHP').textContent='0 BHP';
+  document.getElementById('msTQ').textContent='0 lb-ft';
+  document.getElementById('msTier').textContent='—';
+}
+
+/* Sync auto-spin button style when phase changes */
+function syncAutoSpinBtnStyle(){
+  _updateAutoBtn(); // respects current _autoRunning and phase
+}
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CAR DATABASE  —  38 real-world cars with enthusiast tier ratings
+   Tier is based on car-guy desirability, NOT match percentage
+   SSS = unicorn dream car  |  F = nobody wants this
+══════════════════════════════════════════════════════════ */
+const CAR_DB=[
+  // JDM Legends
+  {name:'Nissan GT-R R35',        disp:3800,layout:'V6', asp:'TT', fuel:'DI',  tx:'7DCT',drive:'AWDTV',diff:'EATV', susp:'DWBDWB',brakes:'CCB', chassis:'HSS',  hp:570, bodyStyle:'GTHom', stanceStyle:'CoilSt',desc:'580hp AWD GT launched in 2007. The benchmark that humiliated supercars.',      tags:['JDM','AWD','Track','Daily'],  tier:'SS'},
+  {name:'Toyota Supra A90',       disp:2998,layout:'I6', asp:'TT', fuel:'DI',  tx:'8ZF', drive:'RWD', diff:'ELSD', susp:'DWBML', brakes:'Std', chassis:'HSS',  hp:382, bodyStyle:'OEMp',   stanceStyle:'20mm',  desc:'BMW-engined Supra. Turbocharged 3L I6. Lightweight, fast, controversial.',  tags:['JDM','RWD','Daily','Sport'],  tier:'A'},
+  {name:'Toyota Supra MK4 (A80)', disp:2997,layout:'I6', asp:'TT', fuel:'MFI', tx:'6MT', drive:'RWD', diff:'OSD',  susp:'DWBML', brakes:'Std', chassis:'HSS',  hp:280, bodyStyle:'SportPk',stanceStyle:'20mm',  desc:'The 2JZ-GTE legend. Stock 280hp, tunable to 1000hp+. Unicorn status.',      tags:['JDM','RWD','Iconic','Drift'], tier:'SSS'},
+  {name:'Nissan Skyline GT-R R34',disp:2568,layout:'I6', asp:'TT', fuel:'MFI', tx:'6MT', drive:'AWDTV',diff:'ATESA',susp:'DWBML',brakes:'Std', chassis:'HSS',  hp:280, bodyStyle:'JDMbmp', stanceStyle:'20mm',  desc:'The Godzilla. RB26DETT. ATTESA AWD. The car of a generation.',             tags:['JDM','AWD','Iconic','Sport'], tier:'SSS'},
+  {name:'Honda NSX NA1',          disp:2997,layout:'V6', asp:'NA', fuel:'PFI', tx:'5MT', drive:'MR',  diff:'OSD',  susp:'DWBDWB',brakes:'Std', chassis:'AluMon',hp:274, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'The everyday supercar. Aluminium monocoque. Mid-engine V6. 90s perfection.', tags:['JDM','MR','Exotic','Daily'],  tier:'SS'},
+  {name:'Honda S2000 AP1',        disp:1997,layout:'I4', asp:'NA', fuel:'PFI', tx:'6MT', drive:'RWD', diff:'OSD',  susp:'DWBDWB',brakes:'Std', chassis:'HSS',  hp:237, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'9000rpm VTEC F20C roadster. Highest specific power NA engine of its era.',    tags:['JDM','RWD','VTEC','Roadster'],tier:'S'},
+  {name:'Mazda RX-7 FD3S',        disp:1308,layout:'RE', asp:'TT', fuel:'PFI', tx:'5MT', drive:'RWD', diff:'OSD',  susp:'DWBML', brakes:'Std', chassis:'HSS',  hp:255, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'Turbocharged twin-rotor. Sequential TT. 50:50 weight distribution perfection.',tags:['JDM','RWD','Rotary','Iconic'],tier:'SS'},
+  {name:'Mazda MX-5 ND',          disp:1998,layout:'I4', asp:'NA', fuel:'DI',  tx:'6MT', drive:'RWD', diff:'OSD',  susp:'DWBML', brakes:'Std', chassis:'HSS',  hp:181, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'The purest roadster. Lightweight front-engine RWD. Half of all sports cars.',  tags:['JDM','RWD','Roadster','Daily'],tier:'B'},
+  {name:'Mitsubishi Lancer Evo IX',disp:1997,layout:'I4',asp:'T',  fuel:'MFI', tx:'6MT', drive:'AWDTV',diff:'EATV',susp:'DWBML', brakes:'Brembo',chassis:'HSS',hp:280, bodyStyle:'JDMbmp', stanceStyle:'CoilSt',desc:'4G63T FQ-spec. Super AYC rear diff. 20VT immense tuning scope.',              tags:['JDM','AWD','Drift','Track'],  tier:'S'},
+  {name:'Subaru WRX STI (GDB)',   disp:1994,layout:'F4', asp:'T',  fuel:'MFI', tx:'6MT', drive:'AWDS', diff:'DCCD', susp:'DWBML', brakes:'Brembo',chassis:'HSS',hp:280, bodyStyle:'JDMbmp', stanceStyle:'20mm',  desc:'EJ207 STI. Centre DCCD diff. Roof scooped, WRC-derived. Rally-bred.',       tags:['JDM','AWD','Rally','Track'],  tier:'A'},
+  {name:'Toyota GR86 (ZN8)',      disp:2387,layout:'F4', asp:'NA', fuel:'DI',  tx:'6MT', drive:'RWD', diff:'M-Diff',susp:'DWBML',brakes:'Std', chassis:'HSS',  hp:228, bodyStyle:'Stock',  stanceStyle:'20mm',  desc:'2nd gen 86. FA24 NA boxer. Low CG. The driver\'s car reborn.',               tags:['JDM','RWD','Daily','Track'],  tier:'B'},
+  {name:'Nissan 370Z NISMO',      disp:3696,layout:'V6', asp:'NA', fuel:'DI',  tx:'6MT', drive:'RWD', diff:'ELSD', susp:'DWBML', brakes:'Brembo',chassis:'HSS',hp:355, bodyStyle:'SportPk',stanceStyle:'20mm',  desc:'VQ37HR V6. NISMO tune. Recaros, Rays wheels. Old-school purity package.',    tags:['JDM','RWD','Classic','Sport'],tier:'B'},
+  // European
+  {name:'Porsche 911 GT3 (992)',  disp:3996,layout:'F6', asp:'NA', fuel:'DI',  tx:'7PDK',drive:'RWD', diff:'ELSD', susp:'DWBDWB',brakes:'Std', chassis:'AluMon',hp:503, bodyStyle:'GTHom', stanceStyle:'CoilTk',desc:'NA 9000rpm flat-six. Touring pack or full roll cage. The benchmark.',          tags:['Euro','RWD','Track','NA'],    tier:'SSS'},
+  {name:'Porsche 911 Turbo S (992)',disp:3745,layout:'F6',asp:'TT',fuel:'DI', tx:'8PDK',drive:'AWDTV',diff:'EATV',susp:'DWBDWB', brakes:'CCB', chassis:'AluMon',hp:650, bodyStyle:'OEMp',   stanceStyle:'20mm',  desc:'650hp all-paw Porsche. 2.7s 0-60. Comfort + supercar pace.',                tags:['Euro','AWD','Hypercar','Daily'],tier:'SS'},
+  {name:'BMW M3 Competition (G80)',disp:2993,layout:'I6', asp:'TT', fuel:'DI',  tx:'8ZF', drive:'RWD', diff:'ELSD', susp:'DWBDWB',brakes:'Std', chassis:'HSS',  hp:503, bodyStyle:'SportPk',stanceStyle:'CoilSt',desc:'S58 twin-turbo I6. 503hp. The modern M3 war. Controversial looks, devastating pace.',tags:['Euro','RWD','Track','Daily'],tier:'A'},
+  {name:'BMW M2 Competition',     disp:2979,layout:'I6', asp:'TT', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'DWBML', brakes:'Std', chassis:'HSS',  hp:410, bodyStyle:'OEMp',   stanceStyle:'20mm',  desc:'S55 engine in M2 body. The last pure M car.',                               tags:['Euro','RWD','Sport','Daily'],  tier:'S'},
+  {name:'Mercedes-AMG GT Black',  disp:3982,layout:'V8', asp:'TT', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'DWBDWB',brakes:'CCB', chassis:'AluMon',hp:730, bodyStyle:'GTRace', stanceStyle:'CoilTk',desc:'M178 V8 Black Series. 730hp. GT3 homologation special. Pure weapon.',         tags:['Euro','RWD','Hypercar','Track'],tier:'SS'},
+  {name:'Audi R8 V10 Plus',       disp:5204,layout:'V10',asp:'NA', fuel:'DI',  tx:'7DCT',drive:'AWDTV',diff:'EATV',susp:'DWBDWB',brakes:'CCB', chassis:'CFRP', hp:610, bodyStyle:'OEMp',   stanceStyle:'20mm',  desc:'Mid-engine 5.2L V10. Naturally aspirated exotic. Audi\'s most honest supercar.',tags:['Euro','AWD','Exotic','NA'],   tier:'SS'},
+  {name:'VW Golf GTI MK8',        disp:1984,layout:'I4', asp:'T',  fuel:'DI',  tx:'7DCT',drive:'FWD', diff:'ELSD', susp:'IndML', brakes:'Std', chassis:'HSS',  hp:245, bodyStyle:'OEMp',   stanceStyle:'20mm',  desc:'The everyman\'s hot hatch. 245hp FWD DSG. The benchmark others chase.',       tags:['Euro','FWD','Hatch','Daily'],  tier:'C'},
+  {name:'Ferrari 296 GTB',        disp:2992,layout:'V6', asp:'TT', fuel:'DI',  tx:'8DCT',drive:'RWD', diff:'ELSD', susp:'DWBDWB',brakes:'CCB', chassis:'CFRP', hp:830, bodyStyle:'GTHom',  stanceStyle:'CoilSt',desc:'V6 hybrid. 830hp system output. Screams at 8500rpm.',                         tags:['Euro','RWD','Exotic','Hybrid'],tier:'SSS'},
+  {name:'Lamborghini Huracan STO',disp:5204,layout:'V10',asp:'NA', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'DWBDWB',brakes:'CCB', chassis:'CFRP', hp:631, bodyStyle:'GTHom',  stanceStyle:'CoilTk',desc:'Super Trofeo Omologata. Rear-drive GT3-derived. Stripped, raw, loud.',         tags:['Euro','RWD','Exotic','Track'], tier:'SSS'},
+  {name:'McLaren 720S',           disp:3994,layout:'V8', asp:'TT', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'Push',  brakes:'CCB', chassis:'CFRP', hp:710, bodyStyle:'OEMp',   stanceStyle:'Stock', desc:'M840T twin-turbo. Carbon monocoque. Proactive Chassis Control. Pure engineering.',tags:['Euro','RWD','Exotic','Track'],tier:'SSS'},
+  {name:'Pagani Huayra R',        disp:5980,layout:'V12',asp:'NA', fuel:'DI',  tx:'6MT', drive:'RWD', diff:'ELSD', susp:'Push',  brakes:'CCB', chassis:'CFRP', hp:840, bodyStyle:'GTRace', stanceStyle:'RaceH', desc:'AMG V12 NA, 840hp in carbon-titanium body. 14 units. The car as art form.',   tags:['Euro','RWD','Hypercar','Boutique'],tier:'SSS'},
+  // American
+  {name:'Dodge Challenger SRT Hellcat',disp:6166,layout:'V8',asp:'SC',fuel:'MFI',tx:'8AT',drive:'RWD',diff:'ELSD',susp:'IndML',brakes:'Std',chassis:'HSS',hp:717,bodyStyle:'AftMkt',stanceStyle:'40mm',desc:'717hp supercharged Hemi V8. Muscle car of the century. Completely ridiculous.',tags:['US','RWD','Muscle','Daily'],tier:'B'},
+  {name:'Ford Mustang GT500',     disp:5200,layout:'V8', asp:'SC', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'IndML', brakes:'CCB', chassis:'HSS',  hp:760, bodyStyle:'AftMkt', stanceStyle:'40mm',  desc:'Shelby GT500 760hp Predator V8. Supercharged. Best Mustang ever made.',     tags:['US','RWD','Muscle','Track'],  tier:'S'},
+  {name:'Chevrolet Corvette C8 Z06',disp:5500,layout:'V8',asp:'NA',fuel:'DI', tx:'8DCT',drive:'RWD', diff:'ELSD', susp:'Push',  brakes:'CCB', chassis:'CFRP', hp:670, bodyStyle:'GTHom',  stanceStyle:'CoilTk',desc:'5.5L LT6 flat-plane V8. Mid-engine Corvette. 8500rpm NA howl. US GT3.',       tags:['US','RWD','Exotic','Track'],  tier:'SS'},
+  {name:'Dodge Viper ACR',        disp:8382,layout:'V10',asp:'NA', fuel:'PFI', tx:'6MT', drive:'RWD', diff:'OSD',  susp:'DWBDWB',brakes:'CCB', chassis:'CFRP', hp:645, bodyStyle:'GTRace', stanceStyle:'CoilTk',desc:'8.4L naturally aspirated V10. ACR aero kit. 30+ production car lap records.',  tags:['US','RWD','Exotic','Track'],  tier:'SS'},
+  {name:'Camaro ZL1 1LE',         disp:6162,layout:'V8', asp:'SC', fuel:'DI',  tx:'6MT', drive:'RWD', diff:'ELSD', susp:'KWCoil',brakes:'CCB', chassis:'HSS',  hp:650, bodyStyle:'AftMkt', stanceStyle:'CoilTk',desc:'LT4 supercharged V8. KW coilovers. 6MT. Track-optimised ZL1. Nurburgring fast.',tags:['US','RWD','Track','Muscle'],  tier:'A'},
+  {name:'Ford GT (2022)',          disp:3497,layout:'V6', asp:'TT', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'Push',  brakes:'CCB', chassis:'CFRP', hp:660, bodyStyle:'GTHom',  stanceStyle:'CoilTk',desc:'EcoBoost V6 mid-engine GT1 homologation. CF monocoque. Le Mans.',            tags:['US','RWD','Exotic','Race'],   tier:'SSS'},
+  // Drift / Track-Focused
+  {name:'Nissan Silvia S15',      disp:1998,layout:'I4', asp:'T',  fuel:'MFI', tx:'6MT', drive:'RWD', diff:'OSD',  susp:'IndML', brakes:'Std', chassis:'HSS',  hp:247, bodyStyle:'JDMbmp', stanceStyle:'CoilSt',desc:'SR20DET 2L turbo. Last manual Silvia. The drift car. 400hp potential.',        tags:['JDM','RWD','Drift','Tuner'],  tier:'A'},
+  {name:'Toyota AE86 Trueno',     disp:1587,layout:'I4', asp:'NA', fuel:'PFI', tx:'5MT', drive:'RWD', diff:'OSD',  susp:'IndML', brakes:'Std', chassis:'SpGF', hp:128, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'4AGE twin-cam. The Initial D legend. 128hp. More rotations than revolutions.',tags:['JDM','RWD','Drift','Classic'],tier:'S'},
+  {name:'BMW E46 M3 CSL',         disp:3246,layout:'I6', asp:'NA', fuel:'DI',  tx:'6MT', drive:'RWD', diff:'ELSD', susp:'DWBML', brakes:'Std', chassis:'CFRP', hp:360, bodyStyle:'SportPk',stanceStyle:'CoilSt',desc:'S54 NA straight-six CSL. Carbon roof, CF chassis brace. Highly collectible.',   tags:['Euro','RWD','Classic','NA'],  tier:'SS'},
+  {name:'Renault Megane RS Trophy-R',disp:1798,layout:'I4',asp:'T',fuel:'DI', tx:'6MT', drive:'FWD', diff:'ELSD', susp:'IndML', brakes:'CCB', chassis:'CFRP', hp:300, bodyStyle:'AftMkt', stanceStyle:'CoilTk',desc:'FWD Nüburgring record holder. 300hp 1.8T. Cup chassis. Ohlins. CF panels.',    tags:['Euro','FWD','Track','Hatch'], tier:'A'},
+  {name:'Honda Civic Type R FK8',  disp:1996,layout:'I4', asp:'T',  fuel:'DI',  tx:'6MT', drive:'FWD', diff:'ELSD', susp:'AdML', brakes:'Std', chassis:'HSS',  hp:316, bodyStyle:'SportPk',stanceStyle:'40mm',  desc:'K20C1 1.5T. Adaptive dampers. Triple exhaust. Le Mans of FWD hot hatches.',  tags:['JDM','FWD','Hatch','Daily'],  tier:'B'},
+  // Hypercar / Exotic
+  {name:'Bugatti Chiron Super Sport',disp:7993,layout:'W16',asp:'QT',fuel:'DI',tx:'7DCT',drive:'AWDTV',diff:'EATV',susp:'AdML',brakes:'CCB',chassis:'CFRP',hp:1600,bodyStyle:'Custom',stanceStyle:'Stock',desc:'1600hp W16 quad-turbo. 304mph top speed. The periodic table of horsepower.',   tags:['Euro','AWD','Hypercar','Record'],tier:'SSS'},
+  {name:'Koenigsegg Agera RS',    disp:5002,layout:'V8', asp:'TT', fuel:'DI',  tx:'7DCT',drive:'RWD', diff:'ELSD', susp:'Push',  brakes:'CCB', chassis:'CFRP', hp:1360,bodyStyle:'Custom', stanceStyle:'Stock', desc:'447mph record holder. 1360hp twin-turbo. Carbon everything. Swedish genius.',tags:['Euro','RWD','Hypercar','Record'],tier:'SSS'},
+  {name:'Lamborghini Aventador SVJ',disp:6498,layout:'V12',asp:'NA',fuel:'DI', tx:'7ISR',drive:'AWDTV',diff:'EATV',susp:'Push', brakes:'CCB', chassis:'CFRP', hp:770, bodyStyle:'GTHom',  stanceStyle:'Stock', desc:'6.5L V12 NA. ALA 2.0 active aero. Nurburgring production record.',            tags:['Euro','AWD','Exotic','NA'],   tier:'SSS'},
+  {name:'Porsche Cayman GT4 RS',  disp:3996,layout:'F6', asp:'NA', fuel:'DI',  tx:'7PDK',drive:'MR',  diff:'ELSD', susp:'DWBDWB',brakes:'Std', chassis:'AluMon',hp:493, bodyStyle:'GTHom', stanceStyle:'CoilTk',desc:'911 GT3 RS engine in mid-engine Cayman. Best driver\'s Porsche ever. 9000rpm.',tags:['Euro','MR','Track','NA'],     tier:'SSS'},
+  // Budget / Common (D & F tier)
+  {name:'Toyota Corolla 1.8 (E210)',disp:1798,layout:'I4',asp:'NA',fuel:'GDI',tx:'CVT', drive:'FWD',  diff:'Open',  susp:'MML',  brakes:'1P',  chassis:'HSS',  hp:140, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'The reliable one. Daily driver spec. Sensible. Nothing exciting happens here.',tags:['JDM','FWD','Daily','Eco'],   tier:'F'},
+  {name:'Honda Jazz GR/Fit',      disp:1498,layout:'I4', asp:'NA', fuel:'GDI', tx:'CVT', drive:'FWD', diff:'Open',  susp:'MML',  brakes:'1P',  chassis:'HSS',  hp:118, bodyStyle:'Stock',  stanceStyle:'Stock', desc:'The people-mover. CVT. Perfect for school runs. Car guys look away.',          tags:['JDM','FWD','Daily','Eco'],   tier:'D'},
+];
+
+/* ══════════════════════════════════════════════════════════
+   LAB STATE  —  mirrors the spin state but freely editable
+══════════════════════════════════════════════════════════ */
+let labState={};
+
+function openLab(){
+  labState={};
+  WHEELS.forEach(w=>{
+    const s=state[w.id];
+    if(s)labState[w.id]=s.v;
+    else labState[w.id]=w.opts[0].v;
+  });
+  buildLabFields();
+  refreshLabStats();
+  document.getElementById('labResults').style.display='none';
+  document.getElementById('carLab').classList.add('visible');
+  document.getElementById('finalScreen').classList.remove('visible');
+}
+
+function closeLab(){
+  document.getElementById('carLab').classList.remove('visible');
+  document.getElementById('finalScreen').classList.add('visible');
+}
+
+/* ── CUSTOM SELECT CONTROL ── */
+let _openCsel=null;
+function toggleCsel(id){
+  const el=document.getElementById(id);
+  if(_openCsel&&_openCsel!==el){_openCsel.classList.remove('open');}
+  el.classList.toggle('open');
+  _openCsel=el.classList.contains('open')?el:null;
+}
+function selectCselOpt(id,v,wid,label,tier){
+  const el=document.getElementById(id);
+  const c=TIER[tier]?.c||'var(--orange)';
+  el.querySelector('.csel-tier').textContent='['+tier+']';
+  el.querySelector('.csel-tier').style.color=c;
+  el.querySelector('.csel-label').textContent=label;
+  el.querySelectorAll('.csel-opt').forEach(o=>o.classList.toggle('csel-active',o.dataset.v===v));
+  el.classList.remove('open');
+  _openCsel=null;
+  labState[wid]=v;
+  refreshLabStats();
+}
+document.addEventListener('click',e=>{
+  if(_openCsel&&!_openCsel.contains(e.target)){
+    _openCsel.classList.remove('open');_openCsel=null;
+  }
+});
+
+/* Build the dropdown fields using custom CSEL — no emojis in labels */
+function buildLabFields(){
+  const perfIds=['disp','layout','asp','fuel','vtrain','tx','drive','diff','susp','brakes','exhaust','chassis'];
+  const styleIds=['bodykit','rims','stance','paint','interior','wing','lights','tint','carbon','branding'];
+  const mkField=(wh,isStyle)=>{
+    const allOpts=applyEngagementCurve(wh.opts.map(o=>({...o})));
+    const tot=allOpts.reduce((a,o)=>a+o.p,0);
+    const cur=labState[wh.id]||allOpts[0].v;
+    const curOpt=allOpts.find(o=>o.v===cur)||allOpts[0];
+    const tid='csel_'+wh.id;
+    const c=TIER[curOpt.tier]?.c||'var(--orange)';
+    const accentCol=isStyle?'#aa44ff':'var(--orange)';
+    const rows=allOpts.map(o=>{
+      const pct=((o.p/tot)*100).toFixed(1);
+      const oc=TIER[o.tier]?.c||'#888';
+      return `<div class="csel-opt ${o.v===cur?'csel-active':''}" data-v="${o.v}"
+        onclick="selectCselOpt('${tid}','${o.v}','${wh.id}','${o.l.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${o.tier}')"
+        style="${o.v===cur?`background:${oc}11`:''}">
+        <span class="csel-otier" style="color:${oc}">[${o.tier}]</span>
+        <span class="csel-olabel">${o.l}</span>
+        <span class="csel-opct">${pct}%</span>
+      </div>`;
+    }).join('');
+    return `<div class="lab-field">
+      <div class="lab-lbl">${wh.name}</div>
+      <div class="csel" id="${tid}" style="--accent:${accentCol}">
+        <div class="csel-trigger" onclick="toggleCsel('${tid}')">
+          <span class="csel-tier" style="color:${c}">[${curOpt.tier}]</span>
+          <span class="csel-label">${curOpt.l}</span>
+          <span class="csel-arrow">▾</span>
+        </div>
+        <div class="csel-list">${rows}</div>
+      </div>
+    </div>`;
+  };
+  document.getElementById('labPerfFields').innerHTML=
+    perfIds.map(id=>WHEELS.find(w=>w.id===id)).filter(Boolean).map(w=>mkField(w,false)).join('');
+  document.getElementById('labStyleFields').innerHTML=
+    styleIds.map(id=>WHEELS.find(w=>w.id===id)).filter(Boolean).map(w=>mkField(w,true)).join('');
+}
+
+/* Compute live stats from labState */
+function labHP(){
+  const w=WHEELS.find(x=>x.id==='disp'),d=+(labState.disp||(w?.opts[6]?.v||2000));
+  const l=labState.layout||'I4';
+  const a=labState.asp||'NA';
+  const fakeState={disp:{v:d},layout:{v:l},asp:{v:a}};
+  return estHP(fakeState);
+}
+function labTQ(){
+  const d=+(labState.disp||2000),l=labState.layout||'I4',a=labState.asp||'NA';
+  return estTQ({disp:{v:d},layout:{v:l},asp:{v:a}});
+}
+function lab060(){
+  const hp=labHP(),dt=labState.drive||'RWD',tx=labState.tx||'6MT';
+  const wts={Steel:1500,HSS:1380,SpGF:850,AluMon:1250,CFRP:1200,HybCF:1100,FullCF:960,TiCF:860,RTM:800};
+  const wt=wts[labState.chassis]||1400;
+  let t=11/(hp/wt*1.4);
+  if(['AWDTV','AWDS','AWDH','DriftAWD'].includes(dt))t*=.88;
+  else if(['RWD','MR'].includes(dt))t*=.95;
+  else if(dt==='FWD')t*=1.06;
+  if(['7DCT','8ZF','7MCT','Xtrac'].includes(tx))t*=.92;
+  else if(tx==='CVT')t*=1.08;
+  else if(['3AT','4AT'].includes(tx))t*=1.12;
+  return Math.max(1.8,Math.min(t,18)).toFixed(1);
+}
+function labTopSpeed(){
+  const hp=labHP(),dt=labState.drive||'RWD';
+  let v=80*Math.pow(hp/200,0.38);
+  if(['AWDTV','AWDS'].includes(dt))v*=0.97;
+  return Math.min(Math.round(v),350);
+}
+function labHandling(){
+  // susp: ordered by increasing capability, matching actual WHEELS option v-values
+  const suspOrder=['MTB','MML','Air','MDWB','DWBML','MLML','DWBDWB','Hydro','Push','EMAct','Race'];
+  const brakeOrder=['DD','DiscDr','1P','2P','B4','B6','Race','AP6','CCM','CCMR'];
+  const diffOrder=['Open','Spool','VLSD','MLSD','HLSD','T2R','ELSD','AYC','TCTV','EMAG'];
+  const susp=Math.max(0,suspOrder.indexOf(labState.susp||'MML'));
+  const brk=Math.max(0,brakeOrder.indexOf(labState.brakes||'1P'));
+  const diff=Math.max(0,diffOrder.indexOf(labState.diff||'Open'));
+  const raw=((susp/(suspOrder.length-1))*40+((brk)/(brakeOrder.length-1))*30+(diff/(diffOrder.length-1))*30);
+  return Math.min(100,Math.round(raw+10));
+}
+function labAero(){
+  const bk=['Stock','OEMp','SportPk','JDMbmp','AftMkt','RB','LBW','GTHom','GTRace','RWB','Custom'].indexOf(labState.bodykit||'Stock');
+  const wg=['None','Lip','OEMSp','Duck','GTWing','CFWing','Swan','FIA_W','DRS','RWBTail'].indexOf(labState.wing||'None');
+  return Math.min(100,Math.round((bk/10)*50+(wg/9)*50));
+}
+function labPW(){
+  const hp=labHP();
+  const wts={Steel:1500,HSS:1380,SpGF:850,AluMon:1250,CFRP:1200,HybCF:1100,FullCF:960,TiCF:860,RTM:800};
+  const wt=wts[labState.chassis]||1400;
+  return (hp/wt*1000).toFixed(0);
+}
+function labStyleScoreLab(){
+  const ids=['bodykit','rims','stance','paint','interior','wing','lights','tint','carbon','branding'];
+  let sc=0,n=0;
+  ids.forEach(id=>{
+    const wh=WHEELS.find(w=>w.id===id);
+    const opt=wh?.opts.find(o=>o.v===labState[id]);
+    if(opt&&opt.tier){sc+=TIER[opt.tier].score;n++;}
+  });
+  if(!n)return 0;
+  return Math.min(10,((sc/n)/7)*10);
+}
+function labSoundChar(){
+  // Uses actual layout v-values and exhaust v-values from WHEELS definitions
+  const ly=labState.layout||'I4',ex=labState.exhaust||'Stock';
+  const snd={I2:'Twin-pot rattle',I3:'Three-cylinder boom',I4:'Raspy four-pot',I5:'Five-cylinder warble',
+    I6:'Silky straight-six',F4:'Flat boxer rumble',F6:'Flat-six shriek',
+    V6:'Baritone V6 bark',V8:'American V8 thunder',V10:'Ten-cylinder howl',
+    V12:'Symphonic orchestral',W12:'Freight-train W12',W16:'God-mode mechanical chorus'};
+  const exMod={
+    Stock:'muffled OEM tone',CatBk:'mild cat-back rumble',AxleV:'valved crackle on demand',
+    TBk:'turbo-back roar',EqLen:'equal-length scream',Ti:'titanium ring',
+    ValvEq:'active bi-modal note',ALscr:'anti-lag rally screamer',Str8:'straight-pipe rage',
+    Inconel:'Inconel race bark',SideEx:'side-exit thunder'
+  };
+  return `${snd[ly]||'Unique engine note'} — ${exMod[ex]||'stock tone'}`;
+}
+
+function refreshLabStats(){
+  const hp=labHP(),tq=labTQ(),t60=lab060(),ts=labTopSpeed();
+  const hand=labHandling(),aero=labAero(),styS=labStyleScoreLab().toFixed(1);
+  const pw=labPW(),snd=labSoundChar();
+  const mkBar=(v,max,col)=>`<div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(v/max)*100).toFixed(0)}%;background:${col}"></div></div>`;
+  const mkStat=(key,val,sub,bar,col='var(--orange)')=>{
+    const b=bar?mkBar(bar[0],bar[1],col):'';
+    return `<div class="stat-card"><div class="stat-key">${key}</div><div class="stat-val" style="color:${col}">${val}</div>${b}<div class="stat-sub">${sub}</div></div>`;
+  };
+  document.getElementById('labStats').innerHTML=
+    mkStat('ESTIMATED POWER',`${hp} BHP`,'At crankshaft',[hp,1600],'var(--orange)')+
+    mkStat('ESTIMATED TORQUE',`${tq} lb-ft`,'At crankshaft',[tq,1600],'#ffcc00')+
+    mkStat('0–60 MPH',`~${t60}s`,'Estimated, optimum conditions')+
+    mkStat('TOP SPEED (EST.)',`~${ts} mph`,'Limited by gearing estimate',[ts,350],'var(--red)')+
+    mkStat('POWER-TO-WEIGHT',`${pw} hp/t`,'hp per tonne (est.)',[+pw,1200],'var(--orange)')+
+    mkStat('HANDLING SCORE',`${hand}/100`,'Suspension + diff + brakes',[hand,100],'#44aa44')+
+    mkStat('AERO SCORE',`${aero}/100`,'Bodykit + wing downforce focus',[aero,100],'#4488ff')+
+    mkStat('STYLE SCORE',`${styS}/10`,'Aesthetic tier average',[+styS,10],'#aa44ff')+
+    mkStat('SOUND CHARACTER',snd,'Engine × exhaust signature');
+}
+
+/* ══════════════════════════════════════════════════════════
+   MATCHING ALGORITHM — Cars coloured by enthusiast tier
+══════════════════════════════════════════════════════════ */
+function carMatchScore(car){
+  let score=0,max=0;
+  const uDisp=+(labState.disp||2000);
+  const uHP=labHP();
+  // 1. Displacement similarity (18pts)
+  max+=18;
+  const dRatio=Math.abs(uDisp-car.disp)/car.disp;
+  if(dRatio<0.06)score+=18;else if(dRatio<0.18)score+=12;else if(dRatio<0.35)score+=6;else if(dRatio<0.60)score+=2;
+  // 2. Engine layout exact match (14pts)
+  max+=14;
+  if(labState.layout===car.layout)score+=14;
+  else if((labState.layout==='I4'&&car.layout==='F4')||(labState.layout==='F4'&&car.layout==='I4'))score+=8;
+  // 3. Aspiration exact match (14pts)
+  max+=14;
+  const aspMap={NA:['NA'],T:['T','TT'],TT:['TT','T'],SC:['SC'],TC:['TC','TT'],QT:['QT','TT']};
+  if((aspMap[labState.asp]||[labState.asp]).includes(car.asp))score+=14;else if(labState.asp&&car.asp&&labState.asp[0]===car.asp[0])score+=5;
+  // 4. Drivetrain match (14pts)
+  max+=14;
+  const driveGroups={FWD:['FWD'],RWD:['RWD','MR'],MR:['MR','RWD'],AWD:['AWDTV','AWDS','AWDH','EATV','ATESA'],AWDTV:['AWDTV','AWDS'],DriftAWD:['RWD','DriftAWD']};
+  const uDrGrp=driveGroups[labState.drive]||[labState.drive];
+  if(uDrGrp.includes(car.drive)||car.drive===labState.drive)score+=14;else if((labState.drive||'').startsWith('AWD')&&car.drive.startsWith('A'))score+=7;
+  // 5. Power band (14pts)
+  max+=14;
+  const hpR=Math.abs(uHP-car.hp)/car.hp;
+  if(hpR<0.08)score+=14;else if(hpR<0.20)score+=9;else if(hpR<0.40)score+=4;else if(hpR<0.65)score+=1;
+  // 6. Gearbox compatibility (8pts)
+  max+=8;
+  const manuals=['6MT','5MT','4MT','7MT'],autos=['8ZF','7DCT','8DCT','7PDK','8PDK','10AT','9AT','8AT','6AT','5AT','4AT','3AT','CVT'];
+  const uIsMan=manuals.includes(labState.tx),cIsMan=manuals.includes(car.tx);
+  if(uIsMan===cIsMan)score+=8;else score+=2;
+  // 7. Chassis weight class (8pts)
+  max+=8;
+  const heavyChass=['Steel','HSS'],lightChass=['CFRP','CFRPB','TiCF','RTM','FullCF'],midChass=['HybCF','AluMon','SpGF'];
+  const inClass=(arr,v)=>arr.includes(v);
+  if(inClass(heavyChass,labState.chassis)&&inClass(heavyChass,car.chassis))score+=8;
+  else if(inClass(lightChass,labState.chassis)&&inClass(lightChass,car.chassis))score+=8;
+  else if(inClass(midChass,labState.chassis)&&inClass(midChass,car.chassis))score+=8;
+  else score+=2;
+  // 8. Style tier alignment (10pts)
+  max+=10;
+  const styleMap={Stock:0,OEMp:1,SportPk:2,JDMbmp:2,AftMkt:3,RB:4,LBW:4,GTHom:5,GTRace:5,RWB:5,Custom:5};
+  const uStyleLvl=styleMap[labState.bodykit]||0;
+  const cStyleLvl=styleMap[car.bodyStyle]||0;
+  const styleDiff=Math.abs(uStyleLvl-cStyleLvl);
+  if(styleDiff===0)score+=10;else if(styleDiff===1)score+=6;else if(styleDiff===2)score+=2;
+  return Math.round((score/max)*100);
+}
+
+function runCarMatch(){
+  const results=CAR_DB.map(c=>({car:c,pct:carMatchScore(c)})).sort((a,b)=>b.pct-a.pct).slice(0,12);
+  document.getElementById('labResults').style.display='block';
+  document.getElementById('matchTitle').textContent=`12 Most Matched Real Cars — Based on Your Spec`;
+  document.getElementById('matchGrid').innerHTML=results.map(({car,pct})=>{
+    // Colour by car enthusiast tier, NOT match percentage
+    const c=TIER[car.tier]?.c||'#888';
+    const w=(pct/100)*100;
+    const tags=car.tags.map(t=>`<span class="match-tag">${t}</span>`).join('');
+    const disp=car.disp>=1000?`${(car.disp/1000).toFixed(1)}L`:`${car.disp}cc`;
+    const tierLabel=car.tier||'B';
+    return `<div class="match-card" style="border-color:${c}44;background:${c}07">
+      <div class="match-top">
+        <div class="match-name" style="color:${c}">${car.name}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <div class="match-pct" style="color:${c}">${pct}%</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:${c}18;color:${c};border:1px solid ${c}44">TIER ${tierLabel}</div>
+        </div>
+      </div>
+      <div class="match-bar-wrap"><div class="match-bar" style="width:${w}%;background:linear-gradient(90deg,${c},${c}88)"></div></div>
+      <div class="match-desc">${disp} ${car.layout} (${car.asp}) — ${car.drive} — ${car.hp}hp &nbsp;&middot;&nbsp; ${car.desc}</div>
+      <div class="match-tags">${tags}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('labResults').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

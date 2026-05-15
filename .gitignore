@@ -1,0 +1,19 @@
+# ── Project internals ──
+tasks.txt
+
+# ── OS generated ──
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.lnk
+
+# ── Editor / IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Logs ──
+*.log
+npm-debug.log*
